@@ -105,7 +105,7 @@
       "Name": "Sponsors",
       "BaseCost": 15,
       "CostGrowth": 1.15,
-      "BaseIncome": 1.0,
+      "BaseIncome": 1,
       "MilestoneLevels": [
         10,
         25,
@@ -116,9 +116,9 @@
     {
       "Id": "bus",
       "Name": "Bus d'équipe",
-      "BaseCost": 120,
-      "CostGrowth": 1.16,
-      "BaseIncome": 8.0,
+      "BaseCost": 400,
+      "CostGrowth": 1.17,
+      "BaseIncome": 6,
       "MilestoneLevels": [
         10,
         25,
@@ -129,9 +129,9 @@
     {
       "Id": "atelier",
       "Name": "Atelier mécano",
-      "BaseCost": 1300,
-      "CostGrowth": 1.17,
-      "BaseIncome": 70,
+      "BaseCost": 10000,
+      "CostGrowth": 1.19,
+      "BaseIncome": 36,
       "MilestoneLevels": [
         10,
         25,
@@ -142,9 +142,9 @@
     {
       "Id": "fanzone",
       "Name": "Fan zone",
-      "BaseCost": 14000,
-      "CostGrowth": 1.18,
-      "BaseIncome": 600,
+      "BaseCost": 250000,
+      "CostGrowth": 1.21,
+      "BaseIncome": 216,
       "MilestoneLevels": [
         10,
         25,
@@ -155,9 +155,9 @@
     {
       "Id": "recup",
       "Name": "Centre de récupération",
-      "BaseCost": 160000,
-      "CostGrowth": 1.19,
-      "BaseIncome": 5200,
+      "BaseCost": 6250000,
+      "CostGrowth": 1.23,
+      "BaseIncome": 1296,
       "MilestoneLevels": [
         10,
         25,
@@ -173,7 +173,7 @@
     "BoostVideoHours": 4,
     "FreePacksPerDay": 3,
     "VideoWattsPerDay": 20,
-    "RaceRewardSeconds": 60,
+    "RaceRewardSeconds": 15,
     "PlaceRewardFactor": [
       3.0,
       2.2,

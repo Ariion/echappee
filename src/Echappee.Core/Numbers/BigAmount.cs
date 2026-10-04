@@ -56,6 +56,7 @@ namespace Echappee.Numbers
         public static BigAmount Scale(double baseValue, double growth, int level)
         {
             if (baseValue <= 0) return Zero;
+            if (level <= 0) return new BigAmount(baseValue);
             double log = Math.Log10(baseValue) + level * Math.Log10(growth);
             int e = (int)Math.Floor(log);
             return FromParts(Math.Pow(10, log - e), e);

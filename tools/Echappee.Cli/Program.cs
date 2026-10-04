@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using Echappee.Config;
 using Echappee.Simulation;
+using Echappee.Economy;
 
 // Outil de développement : regarder une course et mesurer l'équilibrage sans Unity.
 //   dotnet run --project tools/Echappee.Cli -- race [seed] [discipline] [niveau]
@@ -82,6 +83,27 @@ switch (cmd)
             var rep = PlanAnalyzer.Compare(cfg, data.Courses[disc.Circuit], disc, p, none, plan, 50, 1000, 200);
             Console.WriteLine($"{name,-22} victoires {rep.WinRateBefore:P0} -> {rep.WinRateAfter:P0}   podiums {rep.PodiumBefore:P0} -> {rep.PodiumAfter:P0}   rang moyen {rep.AvgRankBefore:0.0} -> {rep.AvgRankAfter:0.0}");
         }
+        break;
+    }
+    case "eco":
+    {
+        // Joueur "glouton" : achète toujours l'amélioration la moins chère, une course toutes les 90 s.
+        var eco = new EconomyService(cfg);
+        var st = new PlayerState(); long now = 1_800_000_000; double hours = double.Parse(Arg(1, "3"));
+        double nextMark = 0; var firsts = new System.Collections.Generic.Dictionary<string, double>();
+        for (double t = 0; t < hours * 3600; t += 1)
+        {
+            eco.Tick(st, 1, now + (long)t);
+            if (((int)t) % 90 == 0) st.Primes = st.Primes + eco.RewardForPlace(st, 6, now).Primes;
+            while (true)
+            {
+                var best = cfg.Infrastructures.OrderBy(i => eco.UpgradeCost(i, st.InfraLevel(i.Id)).ToDouble() / Math.Max(1e-9, eco.UpgradeGain(i, st.InfraLevel(i.Id)).ToDouble())).First();
+                if (!eco.TryUpgrade(st, best.Id)) break;
+                if (!firsts.ContainsKey(best.Id)) firsts[best.Id] = t;
+            }
+            if (t >= nextMark) { Console.WriteLine($"{t / 60,6:0} min  revenu {eco.IncomePerSecond(st, now).ToString(),10}/s  niveaux " + string.Join(" ", cfg.Infrastructures.Select(i => st.InfraLevel(i.Id)))); nextMark += 1800; }
+        }
+        foreach (var kv in firsts) Console.WriteLine($"{kv.Key,-9} premier achat à {kv.Value / 60:0.0} min");
         break;
     }
     default:
