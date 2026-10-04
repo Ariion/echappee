@@ -1,0 +1,977 @@
+<title>Échappée</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+/* Layout: lecture en colonne étroite, galerie de maquettes et tableaux en pleine largeur. Identité: affiche de course vintage, aplats francs, encre épaisse, couleurs de maillots. */
+:root{
+  --bg:#F3F5FA; --surface:#FFFFFF; --ink:#121936; --ink2:#454D70; --muted:#5A6286; --line:#D6DCEA;
+  --accent:#2F54F0; --accent-soft:#E4EAFF; --hot:#E0245E; --warn-bg:#FFF4D6;
+  --s-ra:#0E8F7A; --s-moy:#2F54F0; --s-cib:#E0245E; --s-car:#B7791F;
+  --g-ink:#141A33; --g-chalk:#EEF2F8; --g-paper:#FFFFFF; --g-blue:#3C5BFF; --g-pink:#FF4F8B; --g-yellow:#FFC933; --g-mint:#1FCB8E; --g-violet:#8A5CF6; --g-orange:#FF8A3D; --g-line:#C9D0E4; --g-sub:#5B6488;
+  --f-display:'Big Shoulders Display','Arial Narrow',Impact,sans-serif;
+  --f-body:'Figtree',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --f-mono:'JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0E1329; --surface:#161C3A; --ink:#EEF1FA; --ink2:#B6BDD8; --muted:#8890B0; --line:#2B3464;
+  --accent:#8FA2FF; --accent-soft:#222C5E; --hot:#FF7AA6; --warn-bg:#3A3217;
+  --s-ra:#20A58B; --s-moy:#6A81F0; --s-cib:#DC5A91; --s-car:#B58A28; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0E1329; --surface:#161C3A; --ink:#EEF1FA; --ink2:#B6BDD8; --muted:#8890B0; --line:#2B3464;
+  --accent:#8FA2FF; --accent-soft:#222C5E; --hot:#FF7AA6; --warn-bg:#3A3217;
+  --s-ra:#20A58B; --s-moy:#6A81F0; --s-cib:#DC5A91; --s-car:#B58A28; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.6;padding-inline:18px;padding-block:0 64px;-webkit-text-size-adjust:100%}
+.wrap{max-width:1120px;margin-inline:auto}
+.read{max-width:700px}
+h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;line-height:.95}
+h2{font-size:clamp(38px,7vw,64px);font-weight:900;text-transform:uppercase;letter-spacing:.005em}
+h3{font-size:24px;font-weight:800;text-transform:uppercase;letter-spacing:.01em;line-height:1}
+p{margin:0 0 1em;text-wrap:pretty}
+a{color:var(--accent)}
+.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:0 0 14px}
+section{padding-block:64px 8px;border-top:2px solid var(--ink)}
+section>.wrap>*+*{margin-top:28px}
+.lead{font-size:19px;line-height:1.55;color:var(--ink2)}
+.mono{font-family:var(--f-mono)}
+.small{font-size:13.5px;color:var(--muted);line-height:1.5}
+.scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+/* hero */
+.hero{padding-block:36px 40px;display:grid;gap:32px;grid-template-columns:minmax(0,1fr)}
+@media(min-width:900px){.hero{grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);align-items:center;gap:56px}.hero h1{font-size:clamp(92px,10.5vw,128px)}}
+.hero h1{font-size:clamp(64px,19vw,104px);font-weight:900;letter-spacing:-.005em;line-height:.82;margin:6px 0 20px}
+.hero .sub{font-size:20px;line-height:1.5;max-width:30ch;color:var(--ink2);margin-bottom:18px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-family:var(--f-mono);font-size:12px;border:2px solid var(--ink);border-radius:999px;padding:4px 11px;background:var(--surface)}
+.chip.y{background:var(--g-yellow);color:#141A33;border-color:#141A33}
+.race-card{background:#141A33;border:3px solid var(--ink);border-radius:22px;padding:12px;box-shadow:8px 8px 0 var(--accent);color:#EEF2F8}
+.race-hud{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;font-family:var(--f-mono);font-size:12px;padding:2px 6px 10px}
+.race-hud b{display:block;font-size:20px;font-family:var(--f-display);font-weight:900;letter-spacing:.02em}
+.race-hud .r{text-align:right}
+.race-hud .mid{background:#0B0F22;border:2px solid #3A4375;border-radius:12px;padding:4px 14px;text-align:center}
+.race-hud .mid b{color:var(--g-yellow);font-size:26px;line-height:1}
+.trackbox svg{display:block;width:100%;height:auto;border-radius:12px}
+.ticker{margin-top:10px;font-family:var(--f-mono);font-size:12px;background:#0B0F22;border-radius:10px;padding:8px 12px;color:#C8D0F0;min-height:34px}
+.ticker i{color:var(--g-yellow);font-style:normal}
+.cap-note{margin:14px 4px 0;font-size:12.5px;color:var(--muted)}
+
+/* index */
+.index{display:flex;flex-wrap:wrap;gap:8px;padding-block:18px 28px;border-top:2px solid var(--ink)}
+.index a{font-family:var(--f-mono);font-size:12.5px;text-decoration:none;color:var(--ink);border:2px solid var(--ink);border-radius:8px;padding:5px 12px;background:var(--surface)}
+.index a:hover{background:var(--g-yellow);color:#141A33}
+
+/* decision grid */
+.decide{display:grid;gap:0;grid-template-columns:minmax(0,1fr);border:2px solid var(--ink);background:var(--surface)}
+@media(min-width:760px){.decide{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.decide>div{padding:22px;border-bottom:2px solid var(--ink)}
+@media(min-width:760px){.decide>div:nth-child(odd){border-right:2px solid var(--ink)}.decide>div:nth-last-child(-n+2){border-bottom:0}}
+@media(max-width:759px){.decide>div:last-child{border-bottom:0}}
+.decide h3{margin-bottom:8px}
+.decide p{margin:0;color:var(--ink2);font-size:15.5px}
+.frank{border:2px solid var(--ink);background:var(--warn-bg);padding:22px 24px;border-radius:4px}
+.frank .eyebrow{color:var(--ink)}
+.frank p:last-child{margin:0}
+
+/* tables */
+table.t{border-collapse:collapse;width:100%;font-size:14.5px;min-width:560px}
+.t th,.t td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+.t thead th{font-family:var(--f-mono);font-size:11.5px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);border-bottom:2px solid var(--ink);white-space:nowrap}
+.t td.n,.t th.n{text-align:right;font-family:var(--f-mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.t tbody th{font-weight:700}
+.t tr.hl td,.t tr.hl th{background:var(--accent-soft)}
+.t.sticky th:first-child,.t.sticky td:first-child{position:sticky;left:0;background:var(--bg);z-index:1}
+.t.sticky tr.hl th:first-child,.t.sticky tr.hl td:first-child{background:var(--accent-soft)}
+.sw{display:inline-block;width:11px;height:11px;border-radius:2px;margin-right:7px;vertical-align:-1px}
+.sw.ra{background:var(--s-ra)}.sw.moy{background:var(--s-moy)}.sw.cib{background:var(--s-cib)}.sw.car{background:var(--s-car)}
+.dots{font-family:var(--f-mono);letter-spacing:.1em;white-space:nowrap}
+
+/* loop */
+.loop{list-style:none;margin:0;padding:0;display:grid;gap:30px;grid-template-columns:minmax(0,1fr);counter-reset:l}
+@media(min-width:900px){.loop{grid-template-columns:repeat(5,minmax(0,1fr));gap:34px}}
+.loop li{position:relative;background:var(--surface);border:2px solid var(--ink);border-radius:14px;padding:16px 14px 16px;box-shadow:0 4px 0 var(--ink)}
+.loop li::before{counter-increment:l;content:counter(l);position:absolute;top:-14px;left:12px;width:28px;height:28px;border-radius:50%;background:var(--g-yellow);color:#141A33;border:2px solid #141A33;display:grid;place-items:center;font:800 14px var(--f-mono)}
+.loop li::after{content:"↓";position:absolute;left:50%;bottom:-27px;transform:translateX(-50%);font:700 20px var(--f-mono);color:var(--ink)}
+.loop li:last-child::after{content:"↺ retour à 1"; font-size:12px;white-space:nowrap}
+@media(min-width:900px){.loop li::after{content:"→";left:auto;right:-27px;bottom:auto;top:50%;transform:translateY(-50%)}.loop li:last-child::after{content:none}}
+.loop b{display:block;font:800 21px var(--f-display);text-transform:uppercase;line-height:1;margin:4px 0 6px}
+.loop span{font-size:13.5px;color:var(--ink2);line-height:1.45;display:block}
+
+.feat{display:grid;gap:20px;grid-template-columns:minmax(0,1fr)}
+@media(min-width:760px){.feat{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.feat article{border-top:4px solid var(--ink);padding-top:14px}
+.feat h3{margin-bottom:8px}
+.feat p{font-size:15.5px;color:var(--ink2)}
+.why{font-family:var(--f-mono);font-size:12.5px;color:var(--ink);background:var(--accent-soft);padding:8px 10px;border-radius:6px;margin:0}
+
+/* swatches */
+.swatches{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.swatch{border:2px solid var(--ink);border-radius:10px;overflow:hidden;background:var(--surface)}
+.swatch i{display:block;height:54px}
+.swatch span{display:block;padding:7px 10px 8px;font-size:13px;line-height:1.3}
+.swatch code{font-family:var(--f-mono);font-size:11.5px;color:var(--muted)}
+.typespec{display:grid;gap:14px;grid-template-columns:minmax(0,1fr)}
+@media(min-width:760px){.typespec{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.typespec div{border:2px solid var(--ink);border-radius:10px;padding:14px 16px;background:var(--surface)}
+.typespec .a{font:900 44px/.9 var(--f-display);text-transform:uppercase}
+.typespec .b{font:600 20px/1.2 var(--f-body)}
+.typespec .c{font:500 17px/1.3 var(--f-mono)}
+.typespec small{display:block;margin-top:8px;color:var(--muted);font-size:12.5px}
+
+/* phones gallery */
+.phones{display:flex;gap:26px;overflow-x:auto;padding:6px 2px 22px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch}
+.phones figure{margin:0;flex:0 0 252px;scroll-snap-align:start}
+@media(min-width:1000px){.phones{flex-wrap:wrap;overflow:visible;justify-content:center;gap:38px 26px}}
+.phones figcaption{margin-top:14px;max-width:252px}
+.phones figcaption b{display:block;font:800 20px var(--f-display);text-transform:uppercase;line-height:1;margin-bottom:4px}
+.phones figcaption span{font-size:13.5px;color:var(--ink2);line-height:1.45;display:block}
+
+.phone{position:relative;width:252px;height:520px;border-radius:34px;background:#0B0F22;padding:7px;box-shadow:0 22px 40px -22px rgba(10,15,40,.7)}
+.notch{position:absolute;z-index:4;top:13px;left:50%;transform:translateX(-50%);width:62px;height:16px;border-radius:10px;background:#0B0F22}
+.screen{height:100%;border-radius:27px;overflow:hidden;background:var(--g-chalk);color:var(--g-ink);display:flex;flex-direction:column;font:600 11px/1.25 var(--f-body);position:relative}
+.screen .ic{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto}
+.g-top{display:flex;align-items:center;gap:6px;padding:30px 9px 7px}
+.g-pill{flex:1;display:flex;align-items:center;gap:5px;background:var(--g-paper);border:2px solid var(--g-ink);border-radius:11px;padding:3px 7px;font:700 11px var(--f-mono);box-shadow:0 2px 0 var(--g-ink)}
+.g-pill .ic{color:var(--g-orange)}.g-pill.w .ic{color:var(--g-violet)}
+.g-rev{text-align:center;line-height:1;flex:0 0 auto}.g-rev small{display:block;font-size:8px;color:var(--g-sub);margin-bottom:2px}.g-rev b{font:900 17px var(--f-display);color:var(--g-ink)}
+.g-body{padding:0 9px;display:flex;flex-direction:column;gap:7px;min-height:0;flex:1}
+.g-head{padding:30px 12px 4px}
+.g-title{font:900 21px/1 var(--f-display);text-transform:uppercase}
+.g-sub{font-size:10px;color:var(--g-sub);margin-top:2px}
+.g-race{background:#141A33;border-radius:13px;border:2px solid var(--g-ink);padding:6px;color:#EEF2F8}
+.g-hud{display:flex;justify-content:space-between;align-items:center;font:700 8px var(--f-mono);padding:0 3px 5px;letter-spacing:.04em}
+.g-hud b{font:900 14px var(--f-display);display:block;line-height:1}
+.g-hud .m{text-align:center;color:var(--g-yellow)}.g-hud .m b{font-size:17px}
+.g-hud .r{text-align:right}
+.g-race .trackbox svg{border-radius:8px}
+.g-tick{font:600 9px var(--f-mono);color:#C8D0F0;padding:5px 3px 1px}.g-tick i{color:var(--g-yellow);font-style:normal}
+.g-btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;font:800 11px var(--f-body);color:#fff;background:var(--g-blue);border:2px solid var(--g-ink);border-radius:10px;padding:6px 9px;box-shadow:0 3px 0 var(--g-ink);white-space:nowrap}
+.g-btn.y{background:var(--g-yellow);color:var(--g-ink)}.g-btn.p{background:var(--g-pink)}.g-btn.m{background:var(--g-mint);color:var(--g-ink)}.g-btn.v{background:var(--g-violet)}
+.g-btn.full{width:100%}
+.g-row{display:flex;gap:7px}.g-row>*{flex:1}
+.g-card{background:var(--g-paper);border:2px solid var(--g-ink);border-radius:12px;padding:7px 8px;box-shadow:0 3px 0 var(--g-ink)}
+.g-card h4{margin:0;font:800 11px var(--f-body)}
+.g-card .lv{font:600 9px var(--f-mono);color:var(--g-sub)}
+.g-card .up{font:700 10px var(--f-mono);margin:4px 0 6px;color:var(--g-ink);background:var(--g-chalk);border-radius:6px;padding:2px 5px;display:block}
+.g-card .g-btn{width:100%;font-size:10px;padding:5px 6px;justify-content:space-between}
+.g-nav{margin-top:auto;display:flex;justify-content:space-around;padding:6px 6px 10px;background:var(--g-paper);border-top:2px solid var(--g-ink)}
+.g-nav span{display:grid;place-items:center;width:38px;height:34px;border-radius:11px;color:var(--g-sub);border:2px solid transparent}
+.g-nav span.on{background:var(--g-yellow);color:var(--g-ink);border-color:var(--g-ink);box-shadow:0 2px 0 var(--g-ink)}
+.g-nav .ic{width:19px;height:19px}
+
+/* riders */
+.rider{display:flex;gap:8px;align-items:center}
+.avatar{width:44px;height:44px;border-radius:50%;border:2px solid var(--g-ink);display:grid;place-items:center;flex:0 0 auto;position:relative}
+.screen .avatar .ic{width:28px;height:28px}
+.avatar b{position:absolute;right:-5px;bottom:-5px;font:800 10px var(--f-mono);background:var(--g-ink);color:#fff;border-radius:8px;padding:1px 5px}
+.rider .nm{font:800 12px var(--f-body);line-height:1.1}
+.tier{display:inline-block;font:700 8.5px var(--f-mono);text-transform:uppercase;letter-spacing:.06em;border:1.5px solid var(--g-ink);border-radius:6px;padding:1px 5px;margin-left:4px;vertical-align:1px}
+.t-a{background:#C9D0E4}.t-p{background:var(--g-blue);color:#fff}.t-e{background:var(--g-pink);color:#fff}.t-l{background:var(--g-yellow);color:var(--g-ink)}
+.stats{display:flex;gap:5px;margin-top:4px}
+.stats span{font:700 9px var(--f-mono);background:var(--g-chalk);border-radius:5px;padding:1px 5px}
+.stats em{font-style:normal;color:var(--g-sub);margin-right:3px}
+.pack{border-radius:12px;border:2px solid var(--g-ink);padding:8px;box-shadow:0 3px 0 var(--g-ink)}
+.pack.b{background:#DCE4FF}.pack.v{background:#E9DEFF}
+.pack h4{margin:0 0 1px;font:900 17px var(--f-display);text-transform:uppercase;font-style:italic}
+.pack p{margin:0 0 6px;font-size:9.5px;color:var(--g-sub);line-height:1.25}
+.pack .g-row{gap:5px}.pack .g-btn{font-size:10px;padding:5px 4px}
+.sec{font:800 10px var(--f-mono);letter-spacing:.1em;color:var(--g-sub);text-transform:uppercase;display:flex;justify-content:space-between;padding:2px 2px 0}
+
+/* plan de course */
+.rule{display:flex;flex-wrap:wrap;gap:4px;align-items:center;background:var(--g-paper);border:2px solid var(--g-ink);border-radius:11px;padding:6px 7px;box-shadow:0 3px 0 var(--g-ink);font:700 9.5px var(--f-mono)}
+.rule .k{color:var(--g-sub);font-weight:500}
+.blk{border:1.5px solid var(--g-ink);border-radius:6px;padding:2px 6px}
+.blk.c{background:#DCE4FF}.blk.a{background:#FFD6E5}
+.rule .tg{margin-left:auto;width:24px;height:14px;border-radius:8px;background:var(--g-mint);border:1.5px solid var(--g-ink);position:relative}
+.rule .tg::after{content:"";position:absolute;right:1px;top:1px;width:9px;height:9px;border-radius:50%;background:#fff;border:1.5px solid var(--g-ink)}
+.rule.off{opacity:.55}.rule.off .tg{background:var(--g-line)}.rule.off .tg::after{right:auto;left:1px}
+.sim{background:var(--g-ink);color:#EEF2F8;border-radius:12px;padding:9px 10px;font:600 10px var(--f-mono)}
+.sim b{display:block;font:900 24px/1 var(--f-display);color:var(--g-mint);margin:3px 0}
+.bar{height:7px;border-radius:5px;background:#2C3563;overflow:hidden;margin-top:5px}.bar i{display:block;height:100%;background:var(--g-mint)}
+.add{border:2px dashed var(--g-sub);border-radius:11px;padding:8px;text-align:center;color:var(--g-sub);font:700 10px var(--f-mono)}
+
+/* ligues */
+.ladder{display:flex;gap:4px;padding:0 2px}
+.ladder span{flex:1;height:30px;border-radius:8px;border:2px solid var(--g-ink);display:grid;place-items:center;font:800 8px var(--f-mono);text-transform:uppercase;background:var(--g-paper);color:var(--g-sub)}
+.ladder span.on{background:var(--g-yellow);color:var(--g-ink);box-shadow:0 2px 0 var(--g-ink)}
+.table{background:var(--g-paper);border:2px solid var(--g-ink);border-radius:12px;overflow:hidden}
+.table .h,.table .r{display:grid;grid-template-columns:22px 1fr 34px;gap:6px;padding:5px 9px;align-items:center}
+.table .h{font:700 8px var(--f-mono);text-transform:uppercase;color:var(--g-sub);background:var(--g-chalk);letter-spacing:.06em}
+.table .r{font:700 10.5px var(--f-body);border-top:1px solid var(--g-line)}
+.table .r i{font:700 10px var(--f-mono);font-style:normal;text-align:right}
+.table .r.up{background:#D5F6E9}.table .r.me{background:var(--g-yellow)}.table .r.dn{background:#FFE0EA}
+.table .r s{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;text-decoration:none}
+.zone{font:700 8px var(--f-mono);text-transform:uppercase;letter-spacing:.08em;padding:3px 9px;color:var(--g-sub);background:var(--g-chalk);border-top:1px solid var(--g-line)}
+
+/* boutique */
+.offer{border-radius:14px;border:2px solid var(--g-ink);padding:10px;color:#fff;background:linear-gradient(135deg,#8A5CF6,#FF4F8B);box-shadow:0 3px 0 var(--g-ink)}
+.offer h4{margin:0;font:900 22px/1 var(--f-display);text-transform:uppercase;font-style:italic}
+.offer p{margin:2px 0 7px;font-size:10px;opacity:.95}
+.offer .g-row{align-items:center}
+.timer{font:700 10px var(--f-mono);background:rgba(10,15,40,.55);border-radius:8px;padding:5px 7px;text-align:center}
+.strip{display:flex;align-items:center;gap:8px;background:var(--g-paper);border:2px solid var(--g-ink);border-radius:12px;padding:7px 9px;box-shadow:0 3px 0 var(--g-ink)}
+.strip b{font:800 11px var(--f-body);display:block}.strip small{font-size:9px;color:var(--g-sub)}
+.strip .ic{width:22px;height:22px}
+.strip .g-btn{margin-left:auto;font-size:10px;padding:5px 8px}
+.w3{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.w3 .g-card{padding:6px 4px;text-align:center}
+.w3 .g-card .ic{width:26px;height:26px;color:var(--g-violet);margin:0 auto 2px;display:block}
+.w3 .g-card b{font:900 15px var(--f-display);display:block}
+.w3 .g-card .g-btn{font-size:9px;padding:4px 2px;justify-content:center}
+
+/* disciplines */
+.dgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:7px}
+.dt{border:2px solid var(--g-ink);border-radius:12px;padding:7px;box-shadow:0 3px 0 var(--g-ink);position:relative;background:var(--g-paper)}
+.dt svg.m{display:block;width:100%;height:44px;border-radius:7px;margin-bottom:5px;stroke:var(--g-ink);fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.dt b{font:800 12px var(--f-body);display:block}.dt small{font:600 8.5px var(--f-mono);color:var(--g-sub)}
+.dt.lock{opacity:.7}.dt.lock .ic{position:absolute;right:8px;top:8px;width:14px;height:14px;color:var(--g-ink)}
+.dt.on{outline:3px solid var(--g-yellow);outline-offset:1px}
+
+/* maillot studio */
+.stage{background:var(--g-ink);border-radius:14px;display:grid;place-items:center;padding:10px 0 6px;border:2px solid var(--g-ink)}
+.stage small{font:700 9px var(--f-mono);color:#9AA5D6;letter-spacing:.1em;text-transform:uppercase;margin-top:2px}
+.opts{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.opt{aspect-ratio:1;border-radius:9px;border:2px solid var(--g-ink);position:relative;overflow:hidden;background:var(--g-paper)}
+.opt.sel{outline:3px solid var(--g-yellow);outline-offset:1px}
+.opt .ic{position:absolute;right:3px;top:3px;width:11px;height:11px;color:var(--g-ink)}
+.cols{display:flex;gap:6px;align-items:center}
+.cols i{width:24px;height:24px;border-radius:50%;border:2px solid var(--g-ink);display:block}
+.cols i.sel{box-shadow:0 0 0 3px var(--g-yellow)}
+.cols em{font:700 9px var(--f-mono);font-style:normal;color:var(--g-sub);width:42px}
+
+/* affiche */
+.poster{margin:2px 14px 0;aspect-ratio:4/5;border:3px solid var(--g-ink);border-radius:6px;position:relative;overflow:hidden;background:repeating-conic-gradient(from 0deg at 50% 74%,#FFC933 0 9deg,#FFD966 9deg 18deg);display:flex;flex-direction:column;box-shadow:0 5px 0 var(--g-ink)}
+.poster .pt{background:var(--g-ink);color:var(--g-yellow);font:700 8px var(--f-mono);letter-spacing:.14em;text-transform:uppercase;padding:4px 8px;display:flex;justify-content:space-between}
+.poster h5{margin:8px 0 0;text-align:center;font:900 54px/.85 var(--f-display);text-transform:uppercase;color:var(--g-ink);letter-spacing:-.005em}
+.poster h5 em{font-style:normal;display:block;font-size:19px;letter-spacing:.3em;color:var(--g-pink);-webkit-text-stroke:0;margin-top:6px}
+.poster .art{flex:1;display:grid;place-items:center;color:var(--g-ink)}
+.poster .art svg{width:104px;height:104px;stroke:var(--g-ink);fill:none;stroke-width:1.3;stroke-linecap:round;stroke-linejoin:round}
+.poster .pb{background:var(--g-pink);color:#fff;border-top:3px solid var(--g-ink);padding:6px 8px;display:flex;justify-content:space-between;align-items:center;font:800 9px var(--f-mono);text-transform:uppercase;letter-spacing:.06em}
+.poster .pb b{font:900 17px var(--f-display);letter-spacing:.02em}
+
+/* charts */
+.chart-wrap{background:var(--surface);border:2px solid var(--ink);border-radius:14px;padding:16px 14px 12px;position:relative}
+.chart-wrap h3{margin-bottom:2px}
+.chart-wrap .small{margin:0 0 8px}
+#cash{position:relative;touch-action:pan-y}
+#cash svg{display:block;overflow:visible}
+#cash .grid{stroke:var(--line);stroke-width:1}
+#cash .grid.zero{stroke:var(--ink);stroke-width:1.5}
+#cash .ax{font:500 11px var(--f-mono);fill:var(--muted)}
+#cash .ln{stroke-width:2.5;stroke-linejoin:round;stroke-linecap:round}
+#cash .ln-ra{stroke:var(--s-ra)}#cash .ln-moy{stroke:var(--s-moy)}#cash .ln-cib{stroke:var(--s-cib)}
+#cash .dot{stroke:var(--surface);stroke-width:2}
+#cash .dot-ra{fill:var(--s-ra)}#cash .dot-moy{fill:var(--s-moy)}#cash .dot-cib{fill:var(--s-cib)}
+#cash .lab{font:600 12px var(--f-body);fill:var(--ink)}
+#cash .xh{stroke:var(--ink);stroke-width:1;stroke-dasharray:3 3}
+.tip{position:absolute;top:8px;pointer-events:none;background:var(--ink);color:var(--bg);border-radius:8px;padding:8px 10px;font:500 12px/1.5 var(--f-mono);white-space:nowrap;z-index:3;box-shadow:0 6px 16px -6px rgba(0,0,0,.4)}
+.tip b{display:block;font-weight:700;margin-bottom:2px}
+.tip .sw{margin-right:6px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:10px;font-size:13.5px}
+.legend span{display:inline-flex;align-items:center}
+.legend b{font-family:var(--f-mono);margin-left:8px;font-weight:700}
+details{margin-top:12px}
+summary{cursor:pointer;font-family:var(--f-mono);font-size:12.5px;color:var(--accent)}
+.bars{display:grid;gap:10px}
+.bars .row{display:grid;grid-template-columns:minmax(110px,170px) minmax(0,1fr) 46px;gap:10px;align-items:center;font-size:14px}
+.bars .track{height:16px;background:var(--accent-soft);border-radius:3px;overflow:hidden}
+.bars .track i{display:block;height:100%;background:var(--accent);border-radius:0 4px 4px 0}
+.bars .v{font-family:var(--f-mono);font-weight:700;text-align:right;font-variant-numeric:tabular-nums}
+.grp{display:flex;justify-content:space-between;font-family:var(--f-mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;border-bottom:2px solid var(--ink);padding-bottom:4px;margin:6px 0 2px}
+.rng{display:grid;gap:14px}
+.rng .row{display:grid;gap:5px}
+.rng .lab{display:flex;justify-content:space-between;gap:10px;font-size:14px;flex-wrap:wrap}
+.rng .lab b{font-family:var(--f-mono);font-size:13px}
+.rng .rail{position:relative;height:18px;background:var(--accent-soft);border-radius:4px}
+.rng .rail i{position:absolute;top:3px;bottom:3px;background:var(--accent);border-radius:3px}
+.rng .rail u{position:absolute;top:-3px;bottom:-3px;width:3px;background:var(--ink);text-decoration:none}
+.rng .scale{display:flex;justify-content:space-between;font:500 11px var(--f-mono);color:var(--muted)}
+
+.cols2{display:grid;gap:28px;grid-template-columns:minmax(0,1fr)}
+@media(min-width:900px){.cols2{grid-template-columns:repeat(2,minmax(0,1fr));gap:48px}}
+.risk{display:grid;gap:0;border:2px solid var(--ink);background:var(--surface)}
+.risk>div{padding:16px 20px;border-bottom:1px solid var(--line);display:grid;gap:4px}
+.risk>div:last-child{border-bottom:0}
+.risk b{font:800 21px var(--f-display);text-transform:uppercase;line-height:1}
+.risk p{margin:0;font-size:15px;color:var(--ink2)}
+.risk .fix{font-family:var(--f-mono);font-size:12.5px;color:var(--ink)}
+.road{display:grid;gap:0;border-left:3px solid var(--ink);margin-left:6px}
+.road>div{padding:0 0 22px 24px;position:relative}
+.road>div::before{content:"";position:absolute;left:-11px;top:6px;width:19px;height:19px;border-radius:50%;background:var(--g-yellow);border:3px solid var(--ink)}
+.road b{display:block;font:800 22px var(--f-display);text-transform:uppercase;line-height:1.05}
+.road .when{font-family:var(--f-mono);font-size:12px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+.road p{margin:4px 0 0;font-size:15px;color:var(--ink2)}
+.road .exit{font-family:var(--f-mono);font-size:12.5px;color:var(--ink);margin-top:6px}
+ul.plain{margin:0;padding-left:1.1em}ul.plain li{margin:0 0 .45em}
+.src{font-size:14px;line-height:1.5;color:var(--ink2)}
+.src li{margin-bottom:.5em}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="i-coin" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/></symbol>
+  <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2 5 13h5l-1 9 8-12h-5z"/></symbol>
+  <symbol id="i-trophy" viewBox="0 0 24 24"><path d="M7 4h10v4a5 5 0 0 1-10 0zM7 6H4v1a3 3 0 0 0 3 3M17 6h3v1a3 3 0 0 1-3 3M12 13v4M8 21h8M10 17h4v4h-4z"/></symbol>
+  <symbol id="i-flag" viewBox="0 0 24 24"><path d="M6 3v18M6 4h12l-3 4 3 4H6"/></symbol>
+  <symbol id="i-bike" viewBox="0 0 24 24"><circle cx="6" cy="16" r="4"/><circle cx="18" cy="16" r="4"/><path d="M6 16l4-8h5l3 8M10 8l2 8M9 6h3"/></symbol>
+  <symbol id="i-shirt" viewBox="0 0 24 24"><path d="M8 3 3 6l2 4 2-1v11h10V9l2 1 2-4-5-3a4 4 0 0 1-8 0z"/></symbol>
+  <symbol id="i-shop" viewBox="0 0 24 24"><path d="M3 4h3l2 11h10l2-8H7"/><circle cx="9.5" cy="19.5" r="1"/><circle cx="17" cy="19.5" r="1"/></symbol>
+  <symbol id="i-cards" viewBox="0 0 24 24"><rect x="5" y="3" width="11" height="15" rx="2"/><path d="M9 21h8a2 2 0 0 0 2-2V8"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="6" y="11" width="12" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m10 9 5 3-5 3z"/></symbol>
+  <symbol id="i-rider" viewBox="0 0 24 24"><path d="M5 22c0-5 3-8 7-8s7 3 7 8z"/><path d="M7 9a5 5 0 0 1 10 0v1H7z"/><circle cx="12" cy="11" r="3.2"/></symbol>
+</svg>
+
+<div class="wrap">
+
+<header class="hero">
+  <div>
+    <p class="eyebrow">Dossier de concept · v1 · 4 octobre 2026</p>
+    <h1>ÉCHAPPÉE</h1>
+    <p class="sub">Un jeu mobile de gestion de cyclisme. Tu bâtis l'équipe, tu règles la stratégie, tu regardes le peloton exploser.</p>
+    <div class="chips"><span class="chip y">Hybrid-casual</span><span class="chip">Idle + collection + ligues</span><span class="chip">iOS et Android</span><span class="chip">6 disciplines</span></div>
+    <p class="small" style="margin-top:16px">Nom de travail. À vérifier à l'INPI et à l'EUIPO avant tout dépôt.</p>
+  </div>
+  <div>
+    <div class="race-card" role="group" aria-label="Aperçu animé de la course">
+      <div class="race-hud"><div>TOI<b>561</b></div><div class="mid">P3 / 12<b id="hClock">00:41</b></div><div class="r">NOVA CLUB<b>548</b></div></div>
+      <div class="trackbox" data-hero="1"></div>
+      <div class="ticker" id="hTick"><i>Règle 1</i> déclenchée : ton grimpeur attaque dans la côte</div>
+    </div>
+    <p class="cap-note">Le cœur du jeu : une course de 60 secondes vue du dessus, qui se rejoue toute seule. Les points sont les équipes, le vert c'est toi.</p>
+  </div>
+</header>
+
+<nav class="index" aria-label="Sommaire">
+  <a href="#essentiel">L'essentiel</a><a href="#sport">Le sport</a><a href="#jeu">Le jeu</a><a href="#ecrans">Les écrans</a><a href="#economie">Économie</a><a href="#modele">Business model</a><a href="#previsions">Prévisions</a><a href="#plan">Plan et budget</a><a href="#risques">Risques</a>
+</nav>
+
+<!-- ESSENTIEL -->
+<section id="essentiel">
+<div class="wrap">
+  <p class="eyebrow">L'essentiel</p>
+  <h2>J'ai tranché, voici pourquoi</h2>
+  <p class="lead read">Tu m'as demandé de choisir le sport, de dessiner le jeu et de dire combien ça peut vendre. Voici les quatre décisions, puis mon avis franc.</p>
+  <div class="decide">
+    <div><h3>Le sport : le cyclisme</h3><p>Six disciplines qui se débloquent une par une : route, piste, BMX, VTT, cyclo-cross, gravel. Un seul moteur de simulation, six jeux de contenu.</p></div>
+    <div><h3>Le jeu</h3><p>Course automatique de 60 secondes, revenus passifs, cartes de coureurs, ligues hebdomadaires. Ta signature : le Plan de course, une stratégie que le joueur programme avec des règles SI / ALORS.</p></div>
+    <div><h3>Le modèle</h3><p>Gratuit au téléchargement. 55 % du chiffre d'affaires en achats intégrés, 45 % en publicité vidéo récompensée. Aucune pub imposée pendant une course.</p></div>
+    <div><h3>L'échelle</h3><p>Quatre issues possibles sur la première année. La plus probable : le jeu ne retient pas assez et tu perds le budget de départ, environ 15 000 €. L'objectif : 134 000 € de résultat net. Le rêve : plus d'un million.</p></div>
+  </div>
+  <div class="frank read">
+    <p class="eyebrow">Mon avis franc</p>
+    <p>Le genre est encombré et la médiane du marché est très basse : la plupart des jeux perdent presque tous leurs joueurs en une semaine. Notre prévision dépend d'une seule chose, la rétention à 7 jours.</p>
+    <p>Donc voici ce que je ferais : quatre semaines pour un prototype de la course, uniquement pour vérifier qu'on a envie de la regarder. Ensuite un soft launch. Et pas un euro de publicité payante tant que la rétention à 7 jours n'atteint pas 18 %.</p>
+    <p>Je n'ai rien repris d'un jeu existant : mécaniques génériques du genre (revenus passifs, cartes, packs avec garantie, ligues), mais noms, interface, couleurs et icônes sont à nous.</p>
+  </div>
+</div>
+</section>
+
+<!-- SPORT -->
+<section id="sport">
+<div class="wrap">
+  <p class="eyebrow">Le choix du sport</p>
+  <h2>Pourquoi le vélo</h2>
+  <div class="read">
+    <p class="lead">Le critère numéro un : la course doit être agréable à regarder toute seule, en 60 secondes, sur un petit écran. Le cyclisme gagne parce qu'un peloton raconte une histoire sans effort. Des groupes se forment, une échappée part, la côte fait le tri, le sprint décide.</p>
+    <p>Et ça se décline en six variantes sans changer le moteur. Chaque variante est un lancement : nouveau contenu, nouvelle vidéo de pub, nouveau pic d'installations. Le calendrier de contenu de la première année s'écrit presque tout seul.</p>
+  </div>
+  <div class="scroll"><table class="t">
+    <thead><tr><th>Sport</th><th class="n">Lisible vu du dessus</th><th class="n">Six variantes</th><th class="n">Pas de licence</th><th class="n">Peu saturé</th><th class="n">Accroche</th><th class="n">Total /25</th></tr></thead>
+    <tbody>
+      <tr class="hl"><th>Cyclisme</th><td class="n">5</td><td class="n">5</td><td class="n">5</td><td class="n">4</td><td class="n">4</td><td class="n"><b>23</b></td></tr>
+      <tr><th>Sports d'hiver</th><td class="n">4</td><td class="n">5</td><td class="n">5</td><td class="n">4</td><td class="n">3</td><td class="n">21</td></tr>
+      <tr><th>Sports d'eau</th><td class="n">4</td><td class="n">4</td><td class="n">5</td><td class="n">4</td><td class="n">3</td><td class="n">20</td></tr>
+      <tr><th>Course auto et moto</th><td class="n">5</td><td class="n">5</td><td class="n">5</td><td class="n">1</td><td class="n">3</td><td class="n">19</td></tr>
+      <tr><th>Athlétisme</th><td class="n">3</td><td class="n">4</td><td class="n">5</td><td class="n">3</td><td class="n">4</td><td class="n">19</td></tr>
+      <tr><th>Courses hippiques</th><td class="n">5</td><td class="n">3</td><td class="n">3</td><td class="n">3</td><td class="n">2</td><td class="n">16</td></tr>
+      <tr><th>Football</th><td class="n">3</td><td class="n">3</td><td class="n">1</td><td class="n">1</td><td class="n">5</td><td class="n">13</td></tr>
+    </tbody></table></div>
+  <p class="small read">Les notes sont mon jugement, pas des données. Le football perd à cause des licences de clubs et de joueurs, les courses hippiques à cause de l'image « paris ». La course auto est déjà très occupée, et c'est un jeu de ce genre que tu m'as montré.</p>
+  <div class="read">
+    <p><b>Ce qui me fait hésiter.</b> Le vélo a moins de public aux États-Unis qu'en Europe. Je viserais d'abord la France, la Belgique, l'Italie, l'Espagne, les Pays-Bas et la Colombie, des pays où il a un vrai public. Le Tour de France en juillet offre aussi un pic d'attention à exploiter pour une mise à jour majeure.</p>
+  </div>
+
+  <h3 style="margin-top:44px">Les six disciplines</h3>
+  <div class="scroll"><table class="t">
+    <thead><tr><th>Discipline</th><th>Ce qui change</th><th>Sprint</th><th>Grimpe</th><th>Rouleur</th><th>Technique</th><th>Se débloque</th><th class="n">Durée</th></tr></thead>
+    <tbody>
+      <tr><th>Route</th><td>Côtes, descentes, aspiration maximale</td><td class="dots">●●○</td><td class="dots">●●●</td><td class="dots">●●●</td><td class="dots">●○○</td><td>Au départ</td><td class="n">60 s</td></tr>
+      <tr><th>Piste</th><td>Vélodrome, tout se joue au placement</td><td class="dots">●●●</td><td class="dots">○○○</td><td class="dots">●●○</td><td class="dots">●○○</td><td>Au départ</td><td class="n">30 s</td></tr>
+      <tr><th>BMX</th><td>Départ en grille, bosses, contacts</td><td class="dots">●●●</td><td class="dots">●○○</td><td class="dots">●○○</td><td class="dots">●●●</td><td>Ligue Régionale</td><td class="n">20 s</td></tr>
+      <tr><th>VTT</th><td>Sentiers, rochers, descentes techniques</td><td class="dots">●○○</td><td class="dots">●●●</td><td class="dots">●●○</td><td class="dots">●●●</td><td>Ligue Nationale</td><td class="n">60 s</td></tr>
+      <tr><th>Cyclo-cross</th><td>Boue, barrières, passages à pied</td><td class="dots">●●○</td><td class="dots">●●○</td><td class="dots">●●○</td><td class="dots">●●●</td><td>Ligue Continentale</td><td class="n">45 s</td></tr>
+      <tr><th>Gravel</th><td>Longue distance, météo, usure du matériel</td><td class="dots">●○○</td><td class="dots">●●○</td><td class="dots">●●●</td><td class="dots">●●○</td><td>Ligue World Tour</td><td class="n">90 s</td></tr>
+    </tbody></table></div>
+  <p class="small read">Pour le code : ce tableau est directement une table de poids dans un fichier de configuration. Chaque discipline pondère les quatre stats d'un coureur, et c'est ce qui rend les cartes utiles différemment d'une discipline à l'autre.</p>
+</div>
+</section>
+
+<!-- JEU -->
+<section id="jeu">
+<div class="wrap">
+  <p class="eyebrow">Le jeu</p>
+  <h2>Le jeu en une minute</h2>
+  <p class="lead read">Une boucle courte pour les sessions de 30 secondes, des boucles longues pour revenir tous les jours.</p>
+  <ol class="loop">
+    <li><b>Course</b><span>60 secondes, automatique, vue du dessus. Le peloton se bat, tu regardes.</span></li>
+    <li><b>Primes</b><span>Selon ta place : des primes, des points de ligue, parfois une carte.</span></li>
+    <li><b>Améliorer</b><span>Sponsors, bus d'équipe, atelier : chaque niveau augmente le revenu par seconde.</span></li>
+    <li><b>Packs</b><span>Des Watts ouvrent des packs de coureurs et de matériel. Les doublons montent les niveaux.</span></li>
+    <li><b>Plan de course</b><span>Tu règles la stratégie avec des règles SI / ALORS, et la course suivante change.</span></li>
+  </ol>
+  <div class="scroll"><table class="t">
+    <thead><tr><th>Rythme</th><th>Ce que fait le joueur</th><th>Ce qui le fait revenir</th></tr></thead>
+    <tbody>
+      <tr><th>60 secondes</th><td>Regarde une course, achète une amélioration</td><td>Une course se termine, le prochain achat est presque abordable</td></tr>
+      <tr><th>Un jour</th><td>Récupère le revenu hors ligne (plafonné à 4 heures), ouvre 3 packs gratuits</td><td>Le plafond de 4 heures : au-delà, il perd de l'argent. Une vidéo le lève</td></tr>
+      <tr><th>Une semaine</th><td>Joue sa ligue de 7 jours, promotion ou relégation</td><td>Un classement qui se joue le dimanche soir</td></tr>
+      <tr><th>28 jours</th><td>Avance dans le Pass Saison, découvre une nouvelle discipline ou un événement</td><td>Du contenu qui expire, une récompense finale</td></tr>
+    </tbody></table></div>
+
+  <h3 style="margin-top:44px">Ce qui nous rend différents</h3>
+  <div class="feat">
+    <article><h3>Le Plan de course</h3>
+      <p>Le joueur programme la stratégie avec des règles courtes : SI la pente dépasse 6 %, ALORS le grimpeur attaque. Il ne pilote pas la course, il la prépare. C'est le seul endroit où le talent du joueur compte, et c'est ce qui sépare le jeu d'un simple compteur de chiffres. Les emplacements de règles se débloquent avec le niveau.</p>
+      <p class="why">Pourquoi ça vend : visible en 6 secondes dans une pub, et sujet de discussion entre joueurs.</p></article>
+    <article><h3>Le peloton vivant</h3>
+      <p>Aspiration, fatigue, échappées. La simulation écrit un fil d'événements en direct : « Attaque de T. Brandão dans la côte ». Une course n'est jamais deux fois la même, et chaque résultat a une raison lisible. Le joueur comprend pourquoi il a perdu, donc il améliore au lieu d'abandonner.</p>
+      <p class="why">Pourquoi ça vend : la rétention vient de la compréhension, pas de la chance.</p></article>
+    <article><h3>Le Maillot Studio</h3>
+      <p>Le joueur dessine le maillot de son équipe : motif, couleurs, sponsor. Il apparaît partout : sur les cartes, sur le circuit, sur l'affiche de victoire. Purement cosmétique, donc aucune sensation de pay-to-win, et une marge très élevée. C'est aussi là que ton œil de directeur artistique fait la différence.</p>
+      <p class="why">Pourquoi ça vend : l'attachement à son équipe, et des achats sans impact sur la puissance.</p></article>
+    <article><h3>L'affiche de victoire</h3>
+      <p>Après chaque victoire d'étape, le jeu génère une affiche de course vintage avec le maillot du joueur, prête à partager. Un modèle SVG avec des variables : équipe, discipline, temps, ligue. Elle fait office de publicité gratuite et c'est notre signature visuelle.</p>
+      <p class="why">Pourquoi ça vend : chaque partage est une affiche de pub qui ne coûte rien.</p></article>
+  </div>
+</div>
+</section>
+
+<!-- ECRANS -->
+<section id="ecrans">
+<div class="wrap">
+  <p class="eyebrow">Les écrans</p>
+  <h2>Huit écrans, une identité</h2>
+  <p class="lead read">La direction artistique : l'affiche de course vintage. Aplats francs, contours épais couleur encre, ombres décalées, couleurs de maillots. Rien à voir avec un décor beige de jeu de gestion standard : on reconnaît le jeu sur une capture d'écran de 2 secondes.</p>
+  <div class="swatches">
+    <div class="swatch"><i style="background:#141A33"></i><span>Encre<br><code>#141A33</code></span></div>
+    <div class="swatch"><i style="background:#EEF2F8"></i><span>Craie<br><code>#EEF2F8</code></span></div>
+    <div class="swatch"><i style="background:#3C5BFF"></i><span>Bleu Ligue<br><code>#3C5BFF</code></span></div>
+    <div class="swatch"><i style="background:#FF4F8B"></i><span>Rose Étape<br><code>#FF4F8B</code></span></div>
+    <div class="swatch"><i style="background:#FFC933"></i><span>Jaune Leader<br><code>#FFC933</code></span></div>
+    <div class="swatch"><i style="background:#1FCB8E"></i><span>Menthe Podium<br><code>#1FCB8E</code></span></div>
+  </div>
+  <div class="typespec">
+    <div><div class="a">Échappée</div><small>Big Shoulders Display, titres et chiffres. Étroite, sportive, lisible en petit.</small></div>
+    <div><div class="b">Attaque dans la côte</div><small>Figtree, textes et boutons. Chaleureuse, très lisible sur mobile.</small></div>
+    <div><div class="c">+126 → +129</div><small>JetBrains Mono, valeurs et données. Les chiffres s'alignent.</small></div>
+  </div>
+  <p class="small read">Raretés des cartes : Amateur (gris-bleu), Pro (bleu), Élite (rose), Légende (jaune). Les couleurs des équipes sur le circuit sont toujours les couleurs de leurs maillots.</p>
+
+  <div class="phones">
+
+    <!-- 1 COURSE -->
+    <figure><div class="phone" role="img" aria-label="Écran principal : la course en cours, avec revenu par seconde et améliorations"><div class="notch"></div><div class="screen" aria-hidden="true">
+      <div class="g-top"><div class="g-pill"><svg class="ic"><use href="#i-coin"/></svg>176K</div><div class="g-rev"><small>Revenu /s</small><b>1,26K</b></div><div class="g-pill w"><svg class="ic"><use href="#i-bolt"/></svg>20</div></div>
+      <div class="g-body">
+        <div class="g-race"><div class="g-hud"><div>TOI<b>561</b></div><div class="m">P3 / 12<b>00:41</b></div><div class="r">NOVA CLUB<b>548</b></div></div><div class="trackbox"></div><div class="g-tick"><i>Règle 1</i> grimpeur attaque</div></div>
+        <div class="g-row"><span class="g-btn"><svg class="ic"><use href="#i-flag"/></svg>Plan de course</span><span class="g-btn y"><svg class="ic"><use href="#i-play"/></svg>x2 · 4 h</span></div>
+        <div class="g-row">
+          <div class="g-card"><h4>Sponsors</h4><div class="lv">Niv. 14</div><span class="up">+126 → +129</span><span class="g-btn"><span>Améliorer</span><span>22,5K</span></span></div>
+          <div class="g-card"><h4>Bus d'équipe</h4><div class="lv">Niv. 9</div><span class="up">+84 → +87</span><span class="g-btn"><span>Améliorer</span><span>9,8K</span></span></div>
+        </div>
+      </div>
+      <div class="g-nav"><span class="on"><svg class="ic"><use href="#i-flag"/></svg></span><span><svg class="ic"><use href="#i-cards"/></svg></span><span><svg class="ic"><use href="#i-shirt"/></svg></span><span><svg class="ic"><use href="#i-trophy"/></svg></span><span><svg class="ic"><use href="#i-shop"/></svg></span></div>
+    </div></div><figcaption><b>Course</b><span>Le peloton tourne tout seul, les revenus tombent à chaque seconde. Deux boutons suffisent : la stratégie et le boost.</span></figcaption></figure>
+
+    <!-- 2 EQUIPE -->
+    <figure><div class="phone" role="img" aria-label="Écran équipe : coureurs titulaires et packs"><div class="notch"></div><div class="screen" aria-hidden="true">
+      <div class="g-head"><div class="g-title">Équipe</div><div class="g-sub">Titulaires 2 / 5 · Puissance 561</div></div>
+      <div class="g-body">
+        <div class="pack b"><h4>Pack Pro</h4><p>Un coureur Élite garanti en 15 tirages</p><div class="g-row"><span class="g-btn">x1 · 15 <svg class="ic"><use href="#i-bolt"/></svg></span><span class="g-btn">x10 · 135 <svg class="ic"><use href="#i-bolt"/></svg></span></div></div>
+        <div class="pack v"><h4>Pack Élite</h4><p>Une Légende garantie en 25 tirages</p><div class="g-row"><span class="g-btn v">x1 · 45 <svg class="ic"><use href="#i-bolt"/></svg></span><span class="g-btn v">x10 · 405 <svg class="ic"><use href="#i-bolt"/></svg></span></div></div>
+        <div class="sec"><span>Titulaires</span><span style="color:#0E8F7A">En course</span></div>
+        <div class="g-card rider"><div class="avatar" style="background:var(--g-yellow)"><svg class="ic"><use href="#i-rider"/></svg><b>79</b></div><div><div class="nm">Lucas Varenne<span class="tier t-l">Légende</span></div><div class="stats"><span><em>SPR</em>86</span><span><em>GRP</em>72</span><span><em>ROU</em>68</span></div></div></div>
+        <div class="g-card rider"><div class="avatar" style="background:var(--g-pink)"><svg class="ic"><use href="#i-rider"/></svg><b>62</b></div><div><div class="nm">Mina Okafor<span class="tier t-e">Élite</span></div><div class="stats"><span><em>SPR</em>51</span><span><em>GRP</em>77</span><span><em>ROU</em>64</span></div></div></div>
+      </div>
+      <div class="g-nav"><span><svg class="ic"><use href="#i-flag"/></svg></span><span class="on"><svg class="ic"><use href="#i-cards"/></svg></span><span><svg class="ic"><use href="#i-shirt"/></svg></span><span><svg class="ic"><use href="#i-trophy"/></svg></span><span><svg class="ic"><use href="#i-shop"/></svg></span></div>
+    </div></div><figcaption><b>Équipe</b><span>Les packs sont en haut, les titulaires dessous. Trois stats cyclistes lisibles d'un coup d'œil : sprint, grimpe, rouleur.</span></figcaption></figure>
+
+    <!-- 3 PLAN DE COURSE -->
+    <figure><div class="phone" role="img" aria-label="Écran Plan de course : règles SI / ALORS"><div class="notch"></div><div class="screen" aria-hidden="true">
+      <div class="g-head"><div class="g-title">Plan de course</div><div class="g-sub">Règles actives 3 / 5 · lues de haut en bas</div></div>
+      <div class="g-body">
+        <div class="rule"><span class="k">SI</span><span class="blk c">pente &gt; 6 %</span><span class="k">ALORS</span><span class="blk a">grimpeur attaque</span><span class="tg"></span></div>
+        <div class="rule"><span class="k">SI</span><span class="blk c">fatigue &gt; 70 %</span><span class="k">ALORS</span><span class="blk a">reste dans la roue</span><span class="tg"></span></div>
+        <div class="rule"><span class="k">SI</span><span class="blk c">reste &lt; 2 km</span><span class="k">ALORS</span><span class="blk a">sprinteur lancé</span><span class="tg"></span></div>
+        <div class="rule off"><span class="k">SI</span><span class="blk c">échappée &gt; 20 s</span><span class="k">ALORS</span><span class="blk a">chasse groupée</span><span class="tg"></span></div>
+        <div class="add">+ Ajouter une règle · 1 emplacement libre</div>
+        <div class="sim">SIMULATION · 100 COURSES<b>34 % → 41 %</b>de victoires avec ce plan<div class="bar"><i style="width:41%"></i></div></div>
+        <span class="g-btn m full">Enregistrer le plan</span>
+      </div>
+      <div class="g-nav"><span class="on"><svg class="ic"><use href="#i-flag"/></svg></span><span><svg class="ic"><use href="#i-cards"/></svg></span><span><svg class="ic"><use href="#i-shirt"/></svg></span><span><svg class="ic"><use href="#i-trophy"/></svg></span><span><svg class="ic"><use href="#i-shop"/></svg></span></div>
+    </div></div><figcaption><b>Plan de course</b><span>Notre écran signature. Des blocs de conditions et d'actions, une simulation qui montre l'effet avant d'enregistrer.</span></figcaption></figure>
+
+    <!-- 4 LIGUES -->
+    <figure><div class="phone" role="img" aria-label="Écran des ligues : classement hebdomadaire"><div class="notch"></div><div class="screen" aria-hidden="true">
+      <div class="g-head"><div class="g-title">Ligues</div><div class="g-sub">Ligue Régionale · Semaine 3 · Fin dans 4 j 12 h</div></div>
+      <div class="g-body">
+        <div class="ladder"><span>AMA</span><span class="on">RÉG</span><span>NAT</span><span>CON</span><span>WT</span><span>LÉG</span></div>
+        <div class="table">
+          <div class="h"><span>#</span><span>Équipe</span><span style="text-align:right">PTS</span></div>
+          <div class="r me"><span>1</span><span><s style="background:#1FCB8E"></s>Toi (561)</span><i>72</i></div>
+          <div class="r up"><span>2</span><span><s style="background:#141A33"></s>Vent Debout (540)</span><i>52</i></div>
+          <div class="r up"><span>3</span><span><s style="background:#FFC933"></s>Cadence 90 (498)</span><i>34</i></div>
+          <div class="zone">Maintien</div>
+          <div class="r"><span>4</span><span><s style="background:#FF4F8B"></s>Pignon Fixe (455)</span><i>25</i></div>
+          <div class="r"><span>5</span><span><s style="background:#8A5CF6"></s>Sprint Nord (420)</span><i>17</i></div>
+          <div class="r"><span>6</span><span><s style="background:#22D3EE"></s>Col Raiders (388)</span><i>8</i></div>
+          <div class="zone">Relégation</div>
+          <div class="r dn"><span>7</span><span><s style="background:#3C5BFF"></s>Dérailleurs FC (350)</span><i>8</i></div>
+          <div class="r dn"><span>8</span><span><s style="background:#FF8A3D"></s>Les Rouleurs (301)</span><i>0</i></div>
+        </div>
+      </div>
+      <div class="g-nav"><span><svg class="ic"><use href="#i-flag"/></svg></span><span><svg class="ic"><use href="#i-cards"/></svg></span><span><svg class="ic"><use href="#i-shirt"/></svg></span><span class="on"><svg class="ic"><use href="#i-trophy"/></svg></span><span><svg class="ic"><use href="#i-shop"/></svg></span></div>
+    </div></div><figcaption><b>Ligues</b><span>Six ligues, de Amateur à Légende. Les trois premiers montent, les deux derniers descendent, chaque dimanche soir.</span></figcaption></figure>
+
+    <!-- 5 BOUTIQUE -->
+    <figure><div class="phone" role="img" aria-label="Écran boutique : offre de départ, Pass Saison, packs de Watts"><div class="notch"></div><div class="screen" aria-hidden="true">
+      <div class="g-top"><div class="g-pill"><svg class="ic"><use href="#i-coin"/></svg>190K</div><div class="g-pill w"><svg class="ic"><use href="#i-bolt"/></svg>20</div></div>
+      <div class="g-body">
+        <div class="offer"><h4>Offre de départ</h4><p>1 coureur Élite, 150 Watts, boost x2 pendant 24 h</p><div class="g-row"><span class="timer">47:12:09</span><span class="g-btn y">2,99 €</span></div></div>
+        <div class="strip"><svg class="ic" style="color:#FF8A3D"><use href="#i-trophy"/></svg><div><b>Pass Saison</b><small>Palier 12 / 30 · 24 jours</small></div><span class="g-btn m">Réclamer</span></div>
+        <div class="strip"><svg class="ic" style="color:#3C5BFF"><use href="#i-flag"/></svg><div><b>Sans pub</b><small>Garde les vidéos de bonus</small></div><span class="g-btn">4,99 €</span></div>
+        <div class="sec"><span>Watts</span><span>Gratuit 3 / 3</span></div>
+        <div class="w3">
+          <div class="g-card"><svg class="ic"><use href="#i-bolt"/></svg><b>20</b><span class="g-btn m"><svg class="ic" style="width:11px;height:11px;margin:0;display:inline;color:inherit"><use href="#i-play"/></svg> 3/3</span></div>
+          <div class="g-card"><svg class="ic"><use href="#i-bolt"/></svg><b>150</b><span class="g-btn">0,99 €</span></div>
+          <div class="g-card"><svg class="ic"><use href="#i-bolt"/></svg><b>700</b><span class="g-btn">4,99 €</span></div>
+        </div>
+      </div>
+      <div class="g-nav"><span><svg class="ic"><use href="#i-flag"/></svg></span><span><svg class="ic"><use href="#i-cards"/></svg></span><span><svg class="ic"><use href="#i-shirt"/></svg></span><span><svg class="ic"><use href="#i-trophy"/></svg></span><span class="on"><svg class="ic"><use href="#i-shop"/></svg></span></div>
+    </div></div><figcaption><b>Boutique</b><span>Une seule offre mise en avant, avec un compte à rebours. Les passes dessous, les Watts en bas. Toujours une option gratuite.</span></figcaption></figure>
+
+    <!-- 6 DISCIPLINES -->
+    <figure><div class="phone" role="img" aria-label="Écran de choix de discipline : 2 sur 6 débloquées"><div class="notch"></div><div class="screen" aria-hidden="true">
+      <div class="g-head"><div class="g-title">Disciplines</div><div class="g-sub">2 sur 6 débloquées</div></div>
+      <div class="g-body">
+        <div class="dgrid">
+          <div class="dt on"><svg class="m" viewBox="0 0 44 32" style="background:#DCE4FF"><path d="M4 26c8-14 14 8 22-6s10-4 14-12"/></svg><b>Route</b><small>Débloquée</small></div>
+          <div class="dt"><svg class="m" viewBox="0 0 44 32" style="background:#FFD6E5"><rect x="6" y="8" width="32" height="16" rx="8"/></svg><b>Piste</b><small>Débloquée</small></div>
+          <div class="dt lock"><svg class="ic"><use href="#i-lock"/></svg><svg class="m" viewBox="0 0 44 32" style="background:#FFEFB8"><path d="M4 22q6-10 12 0t12 0 12 0"/></svg><b>BMX</b><small>Ligue Régionale</small></div>
+          <div class="dt lock"><svg class="ic"><use href="#i-lock"/></svg><svg class="m" viewBox="0 0 44 32" style="background:#CFF5E6"><path d="M5 24c6-4 6-12 14-10s6 10 20 4"/><circle cx="19" cy="22" r="1.5"/><circle cx="31" cy="10" r="1.5"/></svg><b>VTT</b><small>Ligue Nationale</small></div>
+          <div class="dt lock"><svg class="ic"><use href="#i-lock"/></svg><svg class="m" viewBox="0 0 44 32" style="background:#E9DEFF"><path d="M4 20h36M14 12v16M28 12v16"/></svg><b>Cyclo-cross</b><small>Ligue Continentale</small></div>
+          <div class="dt lock"><svg class="ic"><use href="#i-lock"/></svg><svg class="m" viewBox="0 0 44 32" style="background:#FFE2CC"><path d="M4 22c10-10 20 6 36-8" stroke-dasharray="3 4"/></svg><b>Gravel</b><small>Ligue World Tour</small></div>
+        </div>
+        <span class="g-btn full" style="margin-top:auto;margin-bottom:8px">Choisir la route</span>
+      </div>
+      <div class="g-nav"><span class="on"><svg class="ic"><use href="#i-flag"/></svg></span><span><svg class="ic"><use href="#i-cards"/></svg></span><span><svg class="ic"><use href="#i-shirt"/></svg></span><span><svg class="ic"><use href="#i-trophy"/></svg></span><span><svg class="ic"><use href="#i-shop"/></svg></span></div>
+    </div></div><figcaption><b>Disciplines</b><span>Chaque nouvelle discipline est un objectif visible et un événement de lancement. Les verrous donnent envie de monter en ligue.</span></figcaption></figure>
+
+    <!-- 7 MAILLOT STUDIO -->
+    <figure><div class="phone" role="img" aria-label="Écran Maillot Studio : dessiner le maillot de l'équipe"><div class="notch"></div><div class="screen" aria-hidden="true">
+      <div class="g-head"><div class="g-title">Maillot Studio</div><div class="g-sub">Appliqué à toute l'équipe</div></div>
+      <div class="g-body">
+        <div class="stage">
+          <svg viewBox="0 0 24 24" width="118" height="118"><defs><clipPath id="jc"><path d="M8 3 3 6l2 4 2-1v11h10V9l2 1 2-4-5-3a4 4 0 0 1-8 0z"/></clipPath></defs><g clip-path="url(#jc)"><rect width="24" height="24" fill="#FF4F8B"/><path d="M0 11l12 5 12-5v3l-12 5-12-5z" fill="#FFC933"/><path d="M0 15l12 5 12-5v2l-12 5-12-5z" fill="#141A33"/><rect x="9" y="6" width="6" height="2" fill="#fff"/></g><path d="M8 3 3 6l2 4 2-1v11h10V9l2 1 2-4-5-3a4 4 0 0 1-8 0z" fill="none" stroke="#EEF2F8" stroke-width=".7" stroke-linejoin="round"/></svg>
+          <small>Cadence Mistral</small>
+        </div>
+        <div class="sec"><span>Motif</span><span>Chevrons</span></div>
+        <div class="opts">
+          <div class="opt" style="background:#FF4F8B"></div>
+          <div class="opt" style="background:repeating-linear-gradient(90deg,#FF4F8B 0 7px,#fff 7px 14px)"></div>
+          <div class="opt sel" style="background:linear-gradient(160deg,#FF4F8B 55%,#FFC933 55% 78%,#141A33 78%)"></div>
+          <div class="opt" style="background:conic-gradient(#141A33 25%,#fff 0 50%,#141A33 0 75%,#fff 0) 0 0/16px 16px"><svg class="ic"><use href="#i-lock"/></svg></div>
+        </div>
+        <div class="cols"><em>Base</em><i style="background:#FF4F8B" class="sel"></i><i style="background:#3C5BFF"></i><i style="background:#1FCB8E"></i><i style="background:#FF8A3D"></i><i style="background:#8A5CF6"></i></div>
+        <div class="cols"><em>Bandes</em><i style="background:#FFC933" class="sel"></i><i style="background:#fff"></i><i style="background:#141A33"></i><i style="background:#22D3EE"></i></div>
+        <span class="g-btn m full" style="margin-top:auto;margin-bottom:8px">Appliquer</span>
+      </div>
+      <div class="g-nav"><span><svg class="ic"><use href="#i-flag"/></svg></span><span><svg class="ic"><use href="#i-cards"/></svg></span><span class="on"><svg class="ic"><use href="#i-shirt"/></svg></span><span><svg class="ic"><use href="#i-trophy"/></svg></span><span><svg class="ic"><use href="#i-shop"/></svg></span></div>
+    </div></div><figcaption><b>Maillot Studio</b><span>Motifs, couleurs, bandes. Les motifs premium sont verrouillés, sans effet sur la puissance de l'équipe.</span></figcaption></figure>
+
+    <!-- 8 AFFICHE -->
+    <figure><div class="phone" role="img" aria-label="Écran de victoire : affiche de course à partager"><div class="notch"></div><div class="screen" aria-hidden="true">
+      <div class="g-head"><div class="g-title">Victoire d'étape</div><div class="g-sub">Ton affiche est prête</div></div>
+      <div class="g-body" style="gap:10px">
+        <div class="poster" style="margin:2px 6px 0">
+          <div class="pt"><span>Étape 12 · Route</span><span>Ligue Rég.</span></div>
+          <h5>Victoire<em>ÉTAPE 12</em></h5>
+          <div class="art"><svg viewBox="0 0 24 24"><use href="#i-bike"/></svg></div>
+          <div class="pb"><span>Cadence Mistral</span><b>00:57,4</b></div>
+        </div>
+        <div class="g-row"><span class="g-btn p"><svg class="ic"><use href="#i-play"/></svg>Partager</span><span class="g-btn y">Enregistrer</span></div>
+      </div>
+      <div class="g-nav"><span class="on"><svg class="ic"><use href="#i-flag"/></svg></span><span><svg class="ic"><use href="#i-cards"/></svg></span><span><svg class="ic"><use href="#i-shirt"/></svg></span><span><svg class="ic"><use href="#i-trophy"/></svg></span><span><svg class="ic"><use href="#i-shop"/></svg></span></div>
+    </div></div><figcaption><b>Affiche de victoire</b><span>Générée à partir d'un modèle et du maillot du joueur. Chaque partage fait la promotion du jeu.</span></figcaption></figure>
+
+  </div>
+  <p class="small read">Maquettes dessinées en code pour être réutilisables telles quelles : les couleurs, les bordures de 2 px et les ombres décalées correspondent aux valeurs à mettre dans l'interface Unity.</p>
+</div>
+</section>
+
+<!-- ECONOMIE -->
+<section id="economie">
+<div class="wrap">
+  <p class="eyebrow">Économie du jeu</p>
+  <h2>Où va l'argent du joueur</h2>
+  <div class="scroll"><table class="t">
+    <thead><tr><th>Monnaie</th><th>Comment on la gagne</th><th>Comment on la dépense</th></tr></thead>
+    <tbody>
+      <tr><th>Primes <span class="small">(souple)</span></th><td>Revenu par seconde, courses, quêtes quotidiennes</td><td>Améliorations d'infrastructures, niveaux de coureurs</td></tr>
+      <tr><th>Watts <span class="small">(premium)</span></th><td>Ligues, passes, vidéos de bonus (environ 20 par jour), succès, achats</td><td>Packs, motifs premium du Maillot Studio, rachat d'un délai</td></tr>
+      <tr><th>Fragments</th><td>Doublons de cartes en ouvrant des packs</td><td>Montée de niveau des coureurs et du matériel</td></tr>
+    </tbody></table></div>
+
+  <h3>Packs et taux affichés</h3>
+  <div class="scroll"><table class="t">
+    <thead><tr><th>Pack</th><th class="n">Prix</th><th class="n">Amateur</th><th class="n">Pro</th><th class="n">Élite</th><th class="n">Légende</th><th>Garantie</th></tr></thead>
+    <tbody>
+      <tr><th>Pack Pro</th><td class="n">15 W · x10 : 135 W</td><td class="n">58 %</td><td class="n">33 %</td><td class="n">8,5 %</td><td class="n">0,5 %</td><td>Un Élite au plus tard au 15e tirage</td></tr>
+      <tr><th>Pack Élite</th><td class="n">45 W · x10 : 405 W</td><td class="n">0 %</td><td class="n">66 %</td><td class="n">29 %</td><td class="n">5 %</td><td>Une Légende au plus tard au 25e tirage</td></tr>
+    </tbody></table></div>
+  <p class="small read">Tous les prix et taux se règlent à distance (Remote Config), jamais en dur dans l'application. Les taux sont affichés dans le jeu : Apple et Google l'exigent pour les packs payants.</p>
+
+  <h3>Les 30 premiers jours</h3>
+  <div class="scroll"><table class="t">
+    <thead><tr><th>Moment</th><th>Ce que vit le joueur</th><th>Ce qu'on lui propose</th></tr></thead>
+    <tbody>
+      <tr><th>Minutes 0 à 5</th><td>Première course (gagnée d'avance), première amélioration</td><td>Un pack gratuit avec un coureur Élite garanti, pour créer l'attachement</td></tr>
+      <tr><th>Minute 10</th><td>Première promotion de ligue</td><td>Première vidéo de bonus : boost x2 pendant 4 heures</td></tr>
+      <tr><th>Jour 1</th><td>Revenu hors ligne au retour, premier bloc du Plan de course</td><td>Offre de départ après la deuxième session</td></tr>
+      <tr><th>Jour 3</th><td>La Piste se débloque, deuxième coureur Élite</td><td>Pass Saison présenté</td></tr>
+      <tr><th>Jour 7</th><td>Maillot Studio, troisième ligue</td><td>Première offre à durée limitée</td></tr>
+      <tr><th>Jour 30</th><td>BMX en vue, plusieurs règles de stratégie actives</td><td>Premier événement de saison</td></tr>
+    </tbody></table></div>
+</div>
+</section>
+
+<!-- MODELE -->
+<section id="modele">
+<div class="wrap">
+  <p class="eyebrow">Business model</p>
+  <h2>Comment le jeu gagne de l'argent</h2>
+  <p class="lead read">Gratuit à télécharger, deux sources de revenus qui coexistent chez le même joueur : la publicité qu'il choisit de regarder, et les achats de ceux qui s'attachent à leur équipe.</p>
+  <div class="scroll"><table class="t">
+    <thead><tr><th>Offre</th><th class="n">Prix</th><th>Contenu</th><th>Quand on la montre</th></tr></thead>
+    <tbody>
+      <tr><th>Offre de départ</th><td class="n">2,99 €</td><td>1 coureur Élite, 150 Watts, boost x2 24 h</td><td>Une seule fois, 48 h, après la 2e session</td></tr>
+      <tr><th>Pass Saison</th><td class="n">gratuit + 4,99 €</td><td>30 paliers sur 28 jours. Premium : Watts, cosmétiques, une Légende au palier 30</td><td>Dès le jour 3</td></tr>
+      <tr><th>Sans pub</th><td class="n">4,99 €</td><td>Supprime les interstitiels, garde les vidéos de bonus</td><td>Après la 3e course sans achat</td></tr>
+      <tr><th>Packs de Watts</th><td class="n">0,99 à 99,99 €</td><td>6 paliers, bonus croissant</td><td>Boutique, et quand il manque des Watts</td></tr>
+      <tr><th>Offres limitées</th><td class="n">4,99 à 9,99 €</td><td>Trois niveaux de valeur, à durée limitée</td><td>Événements, une fois par semaine au maximum</td></tr>
+      <tr><th>Maillot Studio premium</th><td class="n">1,99 à 3,99 €</td><td>Motifs et sponsors cosmétiques</td><td>Dans l'atelier, après la première victoire d'étape</td></tr>
+    </tbody></table></div>
+
+  <div class="cols2">
+    <div>
+      <h3 style="margin-bottom:10px">Origine du chiffre d'affaires visée</h3>
+      <div class="bars" role="img" aria-label="Répartition cible : publicité 45 pour cent, achats intégrés 55 pour cent">
+        <div class="grp"><span>Publicité</span><span>45 %</span></div>
+        <div class="row"><span>Vidéo récompensée</span><div class="track"><i style="width:95%"></i></div><span class="v">38 %</span></div>
+        <div class="row"><span>Interstitiel</span><div class="track"><i style="width:17.5%"></i></div><span class="v">7 %</span></div>
+        <div class="grp" style="margin-top:14px"><span>Achats intégrés</span><span>55 %</span></div>
+        <div class="row"><span>Packs de Watts</span><div class="track"><i style="width:50%"></i></div><span class="v">20 %</span></div>
+        <div class="row"><span>Passes</span><div class="track"><i style="width:45%"></i></div><span class="v">18 %</span></div>
+        <div class="row"><span>Offres limitées</span><div class="track"><i style="width:30%"></i></div><span class="v">12 %</span></div>
+        <div class="row"><span>Cosmétiques</span><div class="track"><i style="width:12.5%"></i></div><span class="v">5 %</span></div>
+      </div>
+    </div>
+    <div>
+      <h3 style="margin-bottom:10px">Les règles de la publicité</h3>
+      <ul class="plain">
+        <li><b>Jamais</b> pendant une course, jamais avant le jour 3.</li>
+        <li><b>Vidéos récompensées</b>, toujours au choix : boost x2 de 4 h, packs gratuits (3 par jour), revenu hors ligne multiplié par 3, relance d'une course perdue.</li>
+        <li><b>Interstitiel</b> : au maximum une fois toutes les 6 minutes, uniquement entre deux écrans.</li>
+        <li><b>Sans pub</b> à 4,99 € : il enlève l'interstitiel mais garde les vidéos de bonus, car elles rapportent aussi au joueur.</li>
+      </ul>
+      <p class="small">Ordre de grandeur : à 0,20 € par joueur actif et par jour, la pub représente environ 0,09 €. Il faut donc environ 5 à 6 vidéos par joueur et par jour à 15 € les mille vues. C'est une hypothèse de ma part à vérifier en soft launch.</p>
+    </div>
+  </div>
+
+  <h3>Les chiffres à atteindre avant d'investir</h3>
+  <div class="scroll"><table class="t">
+    <thead><tr><th>Indicateur</th><th>Médiane du marché</th><th>Cible Échappée</th><th>On arrête ou on revoit si…</th></tr></thead>
+    <tbody>
+      <tr><th>Rétention jour 1</th><td>environ 22 %</td><td>38 %</td><td>moins de 30 % : on refait l'accueil du joueur</td></tr>
+      <tr><th>Rétention jour 7</th><td>moins de 4 %</td><td>18 %</td><td>moins de 12 % : on ne dépense rien en pub</td></tr>
+      <tr><th>Rétention jour 30</th><td>0,7 à 0,8 %</td><td>7 %</td><td>moins de 4 %</td></tr>
+      <tr><th>Revenu par joueur actif et par jour</th><td>0,15 à 0,50 € pour un jeu hybride</td><td>0,20 €</td><td>moins de 0,10 €</td></tr>
+      <tr><th>Coût par installation</th><td>jeu casual, pays riches : 1,50 à 2,50 €</td><td>1,10 € en moyenne</td><td>plus de 1,60 € : on coupe la pub payante</td></tr>
+    </tbody></table></div>
+  <p class="small read">Colonnes 1 et 2 : benchmarks publics 2026, des blogs spécialisés qui se recoupent plutôt bien, à prendre comme des ordres de grandeur (sources en bas de page). Colonnes 3 et 4 : mes objectifs et mes seuils.</p>
+</div>
+</section>
+
+<!-- PREVISIONS -->
+<section id="previsions">
+<div class="wrap">
+  <p class="eyebrow">Combien ça peut rapporter</p>
+  <h2>Quatre issues possibles</h2>
+  <div class="read">
+    <p class="lead">Je ne te donne pas un chiffre, je te donne quatre scénarios, ce qu'ils exigent et leur probabilité selon moi. Un seul chiffre serait un mensonge confortable.</p>
+    <p>Les montants sont en euros, après la commission des stores, la publicité payante, les 12 000 € de budget de lancement et 150 € par mois de serveurs et d'outils. Avant impôts et cotisations. La première année commence au soft launch.</p>
+  </div>
+
+  <div class="scroll"><table class="t sticky">
+    <thead><tr><th></th><th class="n"><span class="sw ra"></span>Raté</th><th class="n"><span class="sw moy"></span>Moyen</th><th class="n"><span class="sw cib"></span>Cible</th><th class="n"><span class="sw car"></span>Carton</th></tr></thead>
+    <tbody>
+      <tr><th>Probabilité (mon estimation)</th><td class="n">50 %</td><td class="n">30 %</td><td class="n">15 %</td><td class="n">5 %</td></tr>
+      <tr><th>Rétention J1 / J7 / J30</th><td class="n">28 / 9 / 3 %</td><td class="n">32 / 12 / 4 %</td><td class="n">38 / 18 / 7 %</td><td class="n">44 / 22 / 10 %</td></tr>
+      <tr><th>Revenu par joueur actif et par jour</th><td class="n">0,07 €</td><td class="n">0,11 €</td><td class="n">0,20 €</td><td class="n">0,32 €</td></tr>
+      <tr><th>Installations (dont payantes)</th><td class="n">9 400 (3 000)</td><td class="n">39 000 (12 000)</td><td class="n">104 000 (57 000)</td><td class="n">310 000 (205 000)</td></tr>
+      <tr><th>Coût par installation payante</th><td class="n">1,60 €</td><td class="n">1,30 €</td><td class="n">1,10 €</td><td class="n">0,95 €</td></tr>
+      <tr><th>Valeur d'un joueur à 90 jours, net</th><td class="n">0,31 €</td><td class="n">0,59 €</td><td class="n">1,56 €</td><td class="n">3,19 €</td></tr>
+      <tr><th>Chiffre d'affaires net</th><td class="n">3 600 €</td><td class="n">28 900 €</td><td class="n">210 700 €</td><td class="n">1 280 000 €</td></tr>
+      <tr><th>Publicité payante dépensée</th><td class="n">4 800 €</td><td class="n">15 600 €</td><td class="n">62 700 €</td><td class="n">194 800 €</td></tr>
+      <tr class="hl"><th>Résultat après tous les coûts</th><td class="n"><b>−15 000 €</b></td><td class="n"><b>≈ 0 €</b></td><td class="n"><b>+134 200 €</b></td><td class="n"><b>+1 072 000 €</b></td></tr>
+      <tr><th>Revenu net par mois au mois 12</th><td class="n">370 €</td><td class="n">3 000 €</td><td class="n">22 900 €</td><td class="n">154 800 €</td></tr>
+      <tr><th>Joueurs actifs par jour au mois 12</th><td class="n">120</td><td class="n">650</td><td class="n">3 100</td><td class="n">13 700</td></tr>
+      <tr><th>Point mort</th><td class="n">jamais</td><td class="n">mois 12</td><td class="n">mois 4</td><td class="n">mois 2</td></tr>
+    </tbody></table></div>
+
+  <div class="chart-wrap">
+    <h3>Trésorerie cumulée, mois par mois</h3>
+    <p class="small">Départ à −12 000 € (budget de lancement). Le scénario Carton est hors échelle : +1 072 000 € au mois 12.</p>
+    <div id="cash"></div>
+    <div class="legend" id="cashLegend"></div>
+    <details><summary>Voir les valeurs en tableau</summary><div class="scroll" id="cashTable"></div></details>
+  </div>
+
+  <div class="cols2">
+    <div>
+      <h3 style="margin-bottom:6px">Ce qui fait vraiment bouger le résultat</h3>
+      <p class="small">Scénario Cible, résultat après tous les coûts (134 000 €), un seul paramètre qui change à la fois. Le trait noir marque le point de départ.</p>
+      <div class="rng" role="img" aria-label="Sensibilité : le revenu par joueur fait varier le résultat de 82 000 à 218 000 euros, la rétention de 97 000 à 171 000, le coût par installation de 106 000 à 151 000">
+        <div class="row"><div class="lab"><span>Revenu par joueur et par jour : 0,15 € à 0,28 €</span><b>82 k€ à 218 k€</b></div><div class="rail"><i style="left:12.2%;width:75.6%"></i><u style="left:41.1%"></u></div></div>
+        <div class="row"><div class="lab"><span>Rétention J7 : 14 % à 22 %</span><b>97 k€ à 171 k€</b></div><div class="rail"><i style="left:20.6%;width:41.1%"></i><u style="left:41.1%"></u></div></div>
+        <div class="row"><div class="lab"><span>Coût par installation : 1,60 € à 0,80 €</span><b>106 k€ à 151 k€</b></div><div class="rail"><i style="left:25.6%;width:25%"></i><u style="left:41.1%"></u></div></div>
+        <div class="scale"><span>60 k€</span><span>150 k€</span><span>240 k€</span></div>
+      </div>
+    </div>
+    <div class="read">
+      <h3 style="margin-bottom:10px">Comment lire tout ça</h3>
+      <p><b>La moyenne pondérée fait environ +66 000 €, mais ne la prends pas pour une prévision.</b> Elle est tirée aux trois quarts par les 5 % du scénario Carton. Le résultat le plus probable est entre −15 000 € et zéro.</p>
+      <p><b>La grande fragilité, c'est le revenu par joueur.</b> À 0,20 € dont 55 % d'achats, il faut environ 3,30 € d'achats par joueur actif et par mois. Avec 5 % de payeurs, cela fait 66 € par payeur et par mois. C'est le haut de ce que fait un bon jeu hybride : traite « Cible » comme un objectif, pas comme une promesse.</p>
+      <p><b>Si le coût par installation passe à 1,60 €</b>, la valeur d'un joueur à 90 jours (1,56 €) ne rembourse plus son achat. On arrête la pub payante, et on vit de l'organique.</p>
+    </div>
+  </div>
+
+  <details class="read"><summary>Hypothèses du modèle</summary>
+    <ul class="plain" style="margin-top:10px">
+      <li>Rétention : points mesurés à J1, J7 et J30, puis J90 égal à la moitié de J30 et J365 à 40 % de J90, avec interpolation lissée entre les points.</li>
+      <li>Revenu par joueur actif constant sur la vie du joueur, pas de saisonnalité, pas de remboursements.</li>
+      <li>Commission des stores de 15 % sur la part achats intégrés (programme petits studios d'Apple et de Google), 0 % sur la publicité.</li>
+      <li>Installations mensuelles du scénario Cible : 3 k, 4 k, 14 k (lancement mondial au mois 3), 12 k, 10 k, 10 k, 9 k, 9 k, 9 k, 8 k, 8 k, 8 k, dont 55 % payantes.</li>
+      <li>Les benchmarks publics sont en dollars, je les ai assimilés à des euros : l'écart est de l'ordre de quelques pour cent, bien en dessous de l'incertitude du reste.</li>
+      <li>Les probabilités sont ma propre estimation, pas une statistique.</li>
+    </ul>
+  </details>
+</div>
+</section>
+
+<!-- PLAN -->
+<section id="plan">
+<div class="wrap">
+  <p class="eyebrow">Plan et budget</p>
+  <h2>De l'idée au soft launch</h2>
+  <p class="lead read">Environ 5 mois pour une première version jouable, à raison de 15 heures par semaine, soit 300 à 400 heures. Le soft launch commence autour de la semaine 17.</p>
+  <div class="road">
+    <div><span class="when">Semaines 1 à 4</span><b>Prototype de la course</b><p>Un circuit, un peloton de 12 équipes, la simulation (aspiration, fatigue) et la boucle de revenu. Rien d'autre.</p><p class="exit">Critère de sortie : 5 personnes regardent la course 60 secondes sans décrocher, et demandent à la relancer.</p></div>
+    <div><span class="when">Semaines 5 à 10</span><b>Le méta-jeu</b><p>Cartes, packs avec garantie, ligues simulées, deux disciplines (route et piste), direction artistique définitive.</p></div>
+    <div><span class="when">Semaines 11 à 16</span><b>Monétisation et mesure</b><p>Pubs, achats, analytics, Plan de course v1, accueil du joueur, tests fermés avec 20 personnes.</p></div>
+    <div><span class="when">Semaines 17 à 20</span><b>Soft launch</b><p>Canada, Australie, Philippines, Pologne. Environ 2 000 installations suffisent pour lire la rétention à jour 1 à trois points près.</p><p class="exit">Seuils : J1 au moins 35 %, J7 au moins 15 %. Sinon, on corrige.</p></div>
+    <div><span class="when">Semaines 21 à 28</span><b>Deux cycles de correction au maximum</b><p>On corrige l'accueil, l'économie, le rythme. Puis décision claire : on lance, ou on arrête.</p></div>
+    <div><span class="when">Mois 8</span><b>Lancement mondial et BMX</b><p>Lancement avec une nouvelle discipline, une vidéo de pub dédiée et la presse spécialisée. C'est le mois 3 du modèle de prévision.</p></div>
+  </div>
+
+  <div class="cols2">
+    <div>
+      <h3 style="margin-bottom:10px">Budget avant le lancement : 12 000 €</h3>
+      <div class="scroll"><table class="t" style="min-width:0">
+        <tbody>
+          <tr><th>Tests de pub en soft launch</th><td class="n">3 000 €</td></tr>
+          <tr><th>Vidéos de pub et créateurs de contenu</th><td class="n">2 500 €</td></tr>
+          <tr><th>Juridique, marque et mentions légales</th><td class="n">1 500 €</td></tr>
+          <tr><th>Son et musique</th><td class="n">800 €</td></tr>
+          <tr><th>Traductions (6 langues)</th><td class="n">700 €</td></tr>
+          <tr><th>Comptes stores, outils, ASO</th><td class="n">500 €</td></tr>
+          <tr><th>Imprévus</th><td class="n">3 000 €</td></tr>
+          <tr class="hl"><th>Total</th><td class="n"><b>12 000 €</b></td></tr>
+        </tbody></table></div>
+      <p class="small" style="margin-top:10px">L'art, l'interface et l'animation ne sont pas dans ce budget : c'est toi qui les produis. Si tu les confiais à quelqu'un, compte plusieurs milliers d'euros de plus.</p>
+    </div>
+    <div>
+      <h3 style="margin-bottom:10px">Technique</h3>
+      <ul class="plain">
+        <li><b>Moteur</b> : Unity 6 en 2D, C#. C'est le choix le plus simple pour brancher les pubs et les achats intégrés.</li>
+        <li><b>Simulation</b> : une classe C# pure, déterministe (une graine donne toujours la même course), testable sans le moteur. On commence par elle.</li>
+        <li><b>Grands nombres</b> : un type dédié pour les montants (K, M, B…), dès le premier jour.</li>
+        <li><b>Backend</b> : Firebase (authentification anonyme, Firestore pour les ligues, Remote Config pour l'économie, Analytics, Cloud Functions).</li>
+        <li><b>Ligues</b> : asynchrones, avec des équipes simulées et des « fantômes » de vrais joueurs. Pas besoin de serveur temps réel.</li>
+        <li><b>Pubs et achats</b> : médiation publicitaire (LevelPlay ou AppLovin MAX) et Unity IAP.</li>
+      </ul>
+    </div>
+  </div>
+  <p class="read">Pour écrire le code avec toi dans Claude Code, je propose cet ordre : la simulation de course avec ses tests, l'économie et les grands nombres, l'interface des écrans, le méta-jeu, puis la monétisation et les analytics.</p>
+</div>
+</section>
+
+<!-- RISQUES -->
+<section id="risques">
+<div class="wrap">
+  <p class="eyebrow">Risques et points de vigilance</p>
+  <h2>Ce qui peut mal tourner</h2>
+  <div class="risk">
+    <div><b>Un genre encombré</b><p>Des jeux très proches existent depuis des années, avec beaucoup plus de contenu. Un joueur qui nous prend pour un clone ne reste pas.</p><span class="fix">Parade : le Plan de course et l'affiche de victoire doivent se voir dans la première pub de 15 secondes.</span></div>
+    <div><b>La rétention</b><p>La médiane du marché est très basse. Tout le modèle repose sur le jour 7.</p><span class="fix">Parade : prototype d'abord, soft launch ensuite, décision chiffrée.</span></div>
+    <div><b>Une dépendance aux gros payeurs</b><p>Dans ce genre de jeu, une petite part des joueurs fait l'essentiel des achats. Un seul mauvais mois peut tout changer.</p><span class="fix">Parade : cosmétiques, passes à prix bas, et un revenu pub qui ne dépend d'aucun payeur.</span></div>
+    <div><b>Les packs payants et la loi</b><p>Certains pays encadrent ou interdisent les packs à tirage payant, la Belgique notamment. Il faut aussi afficher les taux, demander le consentement pour les pubs (RGPD, suivi sur iOS) et choisir une classification d'âge.</p><span class="fix">Parade : faire valider cette partie par un juriste avant le soft launch. Je ne suis ni juriste ni conseiller financier.</span></div>
+    <div><b>La charge de travail en solo</b><p>Un jeu de ce type se vit en événements hebdomadaires. Après le lancement, il faut tenir le rythme.</p><span class="fix">Parade : des événements pilotés par configuration, des modèles réutilisables, pas de code neuf à chaque événement.</span></div>
+    <div><b>Le coût d'acquisition qui monte</b><p>Les benchmarks montrent un coût par installation en hausse d'environ 30 % sur un an.</p><span class="fix">Parade : seuil d'arrêt à 1,60 €, croissance organique par l'affiche de victoire et les créateurs.</span></div>
+    <div><b>Le nom</b><p>« Échappée » est un mot courant, probablement déjà utilisé ailleurs.</p><span class="fix">Parade : recherche d'antériorité à l'INPI et dans les stores avant d'aller plus loin.</span></div>
+  </div>
+</div>
+</section>
+
+<section id="sources">
+<div class="wrap">
+  <p class="eyebrow">Sources</p>
+  <h2>D'où viennent les chiffres</h2>
+  <ul class="plain src read">
+    <li>GameAnalytics, benchmarks mobile 2026 (rétention médiane, jeux les plus performants) : <a href="https://www.gameanalytics.com/reports/2026-mobile-pc-gaming-benchmarks">gameanalytics.com</a></li>
+    <li>Game Growth Advisor, indicateurs de jeux mobiles 2026 : <a href="https://gamegrowthadvisor.com/blog/2026-03-17-mobile-game-kpis-benchmarks-2026/">gamegrowthadvisor.com</a></li>
+    <li>Game Growth Advisor, jeux hybrid-casual 2026 (rétention, seuil de rentabilité de la pub) : <a href="https://gamegrowthadvisor.com/blog/2026-04-16-hybrid-casual-game-design-strategy-2026/">gamegrowthadvisor.com</a></li>
+    <li>Game Growth Advisor, rétention 2026 (taille d'échantillon d'un soft launch) : <a href="https://gamegrowthadvisor.com/blog/2026-03-17-mobile-game-retention-strategies-2026/">gamegrowthadvisor.com</a></li>
+    <li>Playio, revenu par joueur actif et par jour par genre : <a href="https://blog.playio.co/arpdau-benchmarks-mobile-games">blog.playio.co</a></li>
+    <li>Playio, coût par installation 2026 : <a href="https://blog.playio.co/mobile-game-cpi-benchmarks-2026">blog.playio.co</a></li>
+    <li>Galaxy4Games, attentes des éditeurs (rétention demandée) : <a href="https://galaxy4games.com/en/knowledgebase/blog/top-companies-offering-hybrid-casual-game-development-services-in-2026">galaxy4games.com</a></li>
+    <li>Genzopia, statistiques du hybrid-casual 2026 : <a href="https://www.genzopia.com/blog/hyper-casual-games-statistics-2026">genzopia.com</a></li>
+  </ul>
+  <p class="small read">Ce sont des publications spécialisées, pas des études académiques : les chiffres se recoupent mais restent des ordres de grandeur.</p>
+</div>
+</section>
+
+</div>
+
+<script>
+(function(){
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---------- circuit et peloton ---------- */
+  var D = 'M40 110 C20 110 15 80 30 65 C45 50 70 60 85 45 C100 30 125 20 150 28 C180 38 195 65 175 80 C160 91 140 80 125 90 C110 100 125 125 100 130 C75 135 60 112 40 110 Z';
+  var COLORS = ['#3C5BFF','#FF4F8B','#FFC933','#FF8A3D','#8A5CF6','#22D3EE','#F5F7FF','#0B0F22','#A3E635','#FB7185','#94A3B8'];
+  var tid = 0, tracks = [];
+  function build(host){
+    var id = 'k' + (tid++);
+    var s = '<svg viewBox="0 0 210 150" role="img" aria-label="Circuit vu du dessus avec le peloton">' +
+      '<defs><pattern id="chk'+id+'" width="3" height="3" patternUnits="userSpaceOnUse"><rect width="3" height="3" fill="#fff"/><rect width="1.5" height="1.5" fill="#0B0F22"/><rect x="1.5" y="1.5" width="1.5" height="1.5" fill="#0B0F22"/></pattern></defs>' +
+      '<rect width="210" height="150" fill="#10163A"/>' +
+      '<path d="'+D+'" fill="#161E4A" stroke="none"/>' +
+      '<path d="'+D+'" fill="none" stroke="#FF4F8B" stroke-width="19" stroke-dasharray="5 5" stroke-linejoin="round"/>' +
+      '<path d="'+D+'" fill="none" stroke="#EDEFF7" stroke-width="19" stroke-dasharray="5 5" stroke-dashoffset="5" stroke-linejoin="round"/>' +
+      '<path class="trk" d="'+D+'" fill="none" stroke="#2B3366" stroke-width="15" stroke-linejoin="round"/>' +
+      '<path d="'+D+'" fill="none" stroke="#8E99D1" stroke-width="1" stroke-dasharray="4 5" stroke-linejoin="round"/>' +
+      '<rect x="48" y="104" width="3" height="14" fill="url(#chk'+id+')"/>' +
+      '<text x="42" y="40" font-family="JetBrains Mono,monospace" font-size="7" fill="#8E99D1">CÔTE 7 %</text>' +
+      '<text x="56" y="143" font-family="JetBrains Mono,monospace" font-size="7" fill="#8E99D1">ARRIVÉE</text>' +
+      '<g class="riders"></g></svg>';
+    host.innerHTML = s;
+    var svg = host.firstChild, path = svg.querySelector('.trk'), g = svg.querySelector('.riders');
+    var NS = 'http://www.w3.org/2000/svg';
+    var offs = [0.30,0.31,0.32,0.325,0.335,0.34,0.35,0.36,0.37,0.45,0.58,0.80];
+    var riders = [];
+    for (var i = 0; i < 12; i++){
+      var me = (i === 2);
+      var c = document.createElementNS(NS,'circle');
+      c.setAttribute('r', me ? '4.4' : '3.3');
+      c.setAttribute('fill', me ? '#1FCB8E' : COLORS[(i > 2 ? i - 1 : i) % COLORS.length]);
+      c.setAttribute('stroke', me ? '#fff' : '#EEF2F8');
+      c.setAttribute('stroke-width', me ? '1.4' : '0.8');
+      g.appendChild(c);
+      riders.push({el:c, off:offs[i], a:0.004 + (i % 4) * 0.0015, ph:i * 1.7, lane:((i * 37) % 7) - 3});
+    }
+    return {path:path, L:path.getTotalLength(), riders:riders};
+  }
+  function place(tr, t){
+    for (var i = 0; i < tr.riders.length; i++){
+      var r = tr.riders[i];
+      var p = (r.off + t * 0.04 + r.a * Math.sin(t * 0.9 + r.ph)) % 1; if (p < 0) p += 1;
+      var len = p * tr.L, a = tr.path.getPointAtLength(len), b = tr.path.getPointAtLength((len + 1) % tr.L);
+      var dx = b.x - a.x, dy = b.y - a.y, n = Math.sqrt(dx*dx + dy*dy) || 1;
+      r.el.setAttribute('cx', (a.x - dy / n * r.lane * 0.9).toFixed(2));
+      r.el.setAttribute('cy', (a.y + dx / n * r.lane * 0.9).toFixed(2));
+    }
+  }
+  var hosts = document.querySelectorAll('.trackbox');
+  for (var h = 0; h < hosts.length; h++){ var tr = build(hosts[h]); tracks.push(tr); place(tr, 3); }
+  if (!reduce){
+    var t0 = performance.now();
+    (function loop(now){ var t = (now - t0) / 1000 + 3; for (var i = 0; i < tracks.length; i++) place(tracks[i], t); requestAnimationFrame(loop); })(t0);
+    var clock = document.getElementById('hClock'), tick = document.getElementById('hTick'), sec = 41;
+    var msgs = ['<i>Règle 1</i> déclenchée : ton grimpeur attaque dans la côte','Le peloton se scinde en deux groupes','<i>Règle 2</i> : ton rouleur reste dans la roue','Échappée reprise à 3 km de l\'arrivée','<i>Règle 3</i> déclenchée : sprinteur lancé'];
+    var mi = 0;
+    setInterval(function(){ sec = sec <= 0 ? 60 : sec - 1; if (clock) clock.textContent = '00:' + (sec < 10 ? '0' : '') + sec; }, 1000);
+    setInterval(function(){ mi = (mi + 1) % msgs.length; if (tick) tick.innerHTML = msgs[mi]; }, 4200);
+  }
+
+  /* ---------- graphique de trésorerie ---------- */
+  var CASH = {
+    ra:  [-12000,-12083,-12609,-14060,-15024,-15662,-16279,-16077,-15878,-15668,-15447,-15237,-15022],
+    moy: [-12000,-12183,-12655,-13681,-13828,-13254,-12051,-10720,-8814,-6837,-4785,-2663,-476],
+    cib: [-12000,-10254,-7627,-591,9606,21249,34227,48697,64149,80554,97949,115821,134189]
+  };
+  var NAMES = {ra:'Raté', moy:'Moyen', cib:'Cible'};
+  function fmt(v, sign){
+    var k = Math.round(v / 1000), s = Math.abs(k).toString().replace(/\B(?=(\d{3})+(?!\d))/g,' ');
+    return (k < 0 ? '−' : (sign && k > 0 ? '+' : '')) + s + ' k€';
+  }
+  function fmtFull(v){ return (v < 0 ? '−' : '+') + Math.abs(v).toString().replace(/\B(?=(\d{3})+(?!\d))/g,' ') + ' €'; }
+  var host = document.getElementById('cash');
+  function draw(){
+    var W = Math.floor(host.clientWidth) || 320, narrow = W < 480, H = narrow ? 270 : 330;
+    var m = {l: narrow ? 52 : 58, r: narrow ? 52 : 60, t: 12, b: 28};
+    var x0 = m.l, x1 = W - m.r, y0 = H - m.b, y1 = m.t, lo = -20000, hi = 140000;
+    function X(i){ return x0 + (x1 - x0) * i / 12; }
+    function Y(v){ return y0 - (y0 - y1) * (v - lo) / (hi - lo); }
+    var s = '<svg width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Trésorerie cumulée sur 12 mois pour les scénarios Raté, Moyen et Cible">';
+    for (var v = lo; v <= hi; v += 20000){
+      s += '<line class="grid'+(v===0?' zero':'')+'" x1="'+x0+'" x2="'+x1+'" y1="'+Y(v)+'" y2="'+Y(v)+'"/>' +
+           '<text class="ax" x="'+(x0-8)+'" y="'+(Y(v)+4)+'" text-anchor="end">'+fmt(v)+'</text>';
+    }
+    for (var i = 0; i <= 12; i += 2) s += '<text class="ax" x="'+X(i)+'" y="'+(H-8)+'" text-anchor="middle">M'+i+'</text>';
+    ['ra','moy','cib'].forEach(function(k){
+      var d = CASH[k], pts = d.map(function(v, i){ return X(i).toFixed(1)+','+Y(v).toFixed(1); }).join(' ');
+      s += '<polyline class="ln ln-'+k+'" fill="none" points="'+pts+'"/>' +
+           '<circle class="dot dot-'+k+'" cx="'+X(12)+'" cy="'+Y(d[12])+'" r="4.5"/>' +
+           '<text class="lab" x="'+(X(12)+10)+'" y="'+(Y(d[12])+4)+'">'+NAMES[k]+'</text>';
+    });
+    s += '<line id="xh" class="xh" y1="'+y1+'" y2="'+y0+'" x1="0" x2="0" visibility="hidden"/>' +
+         '<rect id="hit" x="'+x0+'" y="'+y1+'" width="'+(x1-x0)+'" height="'+(y0-y1)+'" fill="transparent"/></svg>' +
+         '<div class="tip" id="tip" hidden></div>';
+    host.innerHTML = s;
+    var hit = document.getElementById('hit'), xh = document.getElementById('xh'), tip = document.getElementById('tip');
+    function show(e){
+      var r = host.getBoundingClientRect(), px = e.clientX - r.left;
+      var i = Math.max(0, Math.min(12, Math.round((px - x0) / (x1 - x0) * 12)));
+      xh.setAttribute('x1', X(i)); xh.setAttribute('x2', X(i)); xh.setAttribute('visibility','visible');
+      tip.innerHTML = '<b>Mois ' + i + '</b>' + ['cib','moy','ra'].map(function(k){ return '<div><span class="sw '+k+'"></span>'+NAMES[k]+' '+fmtFull(CASH[k][i])+'</div>'; }).join('');
+      tip.hidden = false;
+      var w = tip.offsetWidth, left = X(i) + 14; if (left + w > W) left = X(i) - w - 14; if (left < 0) left = 0;
+      tip.style.left = left + 'px';
+    }
+    function hide(){ xh.setAttribute('visibility','hidden'); tip.hidden = true; }
+    hit.addEventListener('pointermove', show); hit.addEventListener('pointerdown', show); hit.addEventListener('pointerleave', hide);
+  }
+  var legend = document.getElementById('cashLegend');
+  legend.innerHTML = ['cib','moy','ra'].map(function(k){ return '<span><span class="sw '+k+'"></span>'+NAMES[k]+'<b>'+fmtFull(CASH[k][12])+'</b></span>'; }).join('');
+  var rows = '<table class="t" style="min-width:0"><thead><tr><th>Mois</th><th class="n">Raté</th><th class="n">Moyen</th><th class="n">Cible</th></tr></thead><tbody>';
+  for (var i = 0; i <= 12; i++) rows += '<tr><th>M'+i+'</th><td class="n">'+fmtFull(CASH.ra[i])+'</td><td class="n">'+fmtFull(CASH.moy[i])+'</td><td class="n">'+fmtFull(CASH.cib[i])+'</td></tr>';
+  document.getElementById('cashTable').innerHTML = rows + '</tbody></table>';
+  draw();
+  if (window.ResizeObserver){ var last = host.clientWidth; new ResizeObserver(function(){ if (host.clientWidth !== last){ last = host.clientWidth; draw(); } }).observe(host); }
+  else window.addEventListener('resize', draw);
+})();
+</script>

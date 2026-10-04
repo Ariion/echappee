@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <!-- netstandard2.1 : compatible avec Unity 6 -->
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <RootNamespace>Echappee</RootNamespace>
+    <AssemblyName>Echappee.Core</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- Dans Unity : package gratuit com.unity.nuget.newtonsoft-json -->
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
+</Project>
