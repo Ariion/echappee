@@ -7,7 +7,7 @@ namespace Echappee.Monetization
     public enum OfferKind { Starter, SeasonPass, NoAds, LimitedOffer, StudioPremium }
 
     /// <summary>Quand proposer chaque offre (règles du tableau Business model).</summary>
-    public sealed class OfferPolicy
+    public sealed class OfferPolicy : Echappee.Economy.OfferPolicyLike
     {
         readonly BalanceConfig _cfg;
         public OfferPolicy(BalanceConfig cfg) { _cfg = cfg; }

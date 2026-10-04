@@ -118,7 +118,7 @@ public class SimulationTests
     public void Simulation_core_has_no_unity_or_system_random_dependency()
     {
         var root = System.IO.Path.GetFullPath(System.IO.Path.Combine(System.AppContext.BaseDirectory, "../../../../../src/Echappee.Core"));
-        foreach (var f in System.IO.Directory.GetFiles(root, "*.cs", System.IO.SearchOption.AllDirectories))
+        foreach (var f in System.IO.Directory.GetFiles(root, "*.cs", System.IO.SearchOption.AllDirectories).Where(x => !x.Contains("/obj/") && !x.Contains("/bin/")))
         {
             var text = System.IO.File.ReadAllText(f);
             Assert.DoesNotContain("UnityEngine", text);

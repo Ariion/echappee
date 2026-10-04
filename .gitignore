@@ -25,3 +25,6 @@ unity/Assets/Scripts/Core/
 unity/Assets/Scripts/Core.meta
 unity/Assets/Resources/Data/
 unity/Assets/Resources/Data.meta
+# copiés au build
+src/Echappee.Web/wwwroot/data/
+src/Echappee.Web/wwwroot/service-worker-assets.js

@@ -20,6 +20,7 @@ namespace Echappee.Config
         public OfferTuning Offers = new OfferTuning();
         public RetentionGates Gates = new RetentionGates();
         public ComplianceTuning Compliance = new ComplianceTuning();
+        public ShopTuning Shop = new ShopTuning();
 
         public static BalanceConfig FromJson(string json) =>
             JsonConvert.DeserializeObject<BalanceConfig>(json);
@@ -104,6 +105,11 @@ namespace Echappee.Config
         public double[] CardChanceByPlace;
         public int RiderLevelCap = 10;
         public double LevelStatBonusPct = 3;      // +% de stats par niveau
+        public int PromotionWatts = 60;
+        public int DailyLoginWatts = 10;
+        public int StartingStarters = 4;          // coureurs Amateur donnés au départ (+ 1 Élite garanti)
+        public double BotLevelBase = 40;          // niveau des équipes adverses en ligue Amateur
+        public double BotLevelPerTier = 6;
     }
 
     public sealed class RarityConfig
@@ -167,5 +173,28 @@ namespace Echappee.Config
         /// <summary>Codes pays (ISO 3166-1 alpha-2) où l'ouverture de packs avec tirage payant est désactivée. À faire valider (voir docs/LEGAL.md).</summary>
         public string[] PaidPackBlockedRegions = new string[0];
         public int MinimumAge = 12;
+    }
+}
+
+namespace Echappee.Config
+{
+    public sealed class WattsPackConfig { public string Id; public string Name; public int Watts; public double PriceEur; }
+
+    public sealed class ShopTuning
+    {
+        public List<WattsPackConfig> WattsPacks = new List<WattsPackConfig>();
+        public double StarterPriceEur = 2.99;
+        public int StarterWatts = 150;
+        public double StarterBoostHours = 24;
+        public double NoAdsPriceEur = 4.99;
+        public double SeasonPassPriceEur = 4.99;
+        public int SeasonPassTiers = 30;
+        public int SeasonPassDays = 28;
+        public int PassRacesPerTier = 6;
+        public int PassFreeWattsEvery = 5;
+        public int PassFreeWatts = 20;
+        public int PassPremiumWattsPerTier = 10;
+        public double PassFreePrimesMinutes = 10;     // minutes de revenu offertes à chaque palier gratuit
+        public double StudioPremiumPriceEur = 1.99;
     }
 }

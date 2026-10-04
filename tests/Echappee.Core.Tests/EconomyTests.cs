@@ -380,7 +380,7 @@ public class MonetizationTests
     {
         var root = System.IO.Path.GetFullPath(System.IO.Path.Combine(System.AppContext.BaseDirectory, "../../../../../src/Echappee.Core"));
         var src = string.Join("\n", System.IO.Directory.GetFiles(root, "*.cs", System.IO.SearchOption.AllDirectories)
-            .Where(f => !f.EndsWith("BalanceConfig.cs")).Select(System.IO.File.ReadAllText));
+            .Where(f => !f.EndsWith("BalanceConfig.cs") && !f.Contains("/obj/") && !f.Contains("/bin/")).Select(System.IO.File.ReadAllText));
         foreach (var banned in new[] { "2.99", "4.99", "0.99", "99.99", "58.0", "8.5", "135", "405" })
             Assert.DoesNotContain(banned, src);
     }
@@ -435,5 +435,95 @@ public class ComplianceTests
         Assert.False(packs.IsPaidOpeningAllowed("be"));
         Assert.True(packs.IsPaidOpeningAllowed("FR"));
         Assert.True(packs.IsPaidOpeningAllowed(null));
+    }
+}
+
+public class ShopTests
+{
+    static readonly GameData D = TestData.Load();
+    static readonly EconomyService Eco = new EconomyService(D.Balance);
+    static readonly PackService Packs = new PackService(D);
+    static readonly ShopService Shop = new ShopService(D, Eco, Packs);
+    static readonly OfferPolicy Offers = new OfferPolicy(D.Balance);
+    const long T0 = 1_800_000_000;
+
+    [Fact]
+    public void New_game_gives_four_amateurs_one_elite_all_starters()
+    {
+        var s = new PlayerState();
+        Shop.NewGame(s, T0, new Rng(1));
+        Assert.Equal(5, s.Starters.Count);
+        var team = Packs.BuildTeam(s, "p", "Moi");
+        Assert.Equal(5, team.Starters.Count);
+        Assert.Equal(1, team.Starters.Count(r => r.Rarity == Rarity.Elite));
+        Assert.True(team.Starters.All(r => r.Stats.Sprint > 0));
+    }
+
+    [Fact]
+    public void Watts_packs_match_config_and_flag_purchaser()
+    {
+        var s = new PlayerState();
+        Assert.Equal(6, D.Balance.Shop.WattsPacks.Count);
+        Assert.True(Shop.BuyWattsPack(s, "w2"));
+        Assert.Equal(700, s.Watts); Assert.True(s.EverPurchased);
+        Assert.False(Shop.BuyWattsPack(s, "nope"));
+    }
+
+    [Fact]
+    public void Starter_offer_can_be_bought_once_inside_its_window()
+    {
+        var s = new PlayerState { SessionCount = 2 };
+        Offers.TryStartStarter(s, T0);
+        Assert.True(Shop.BuyStarter(s, Offers, T0 + 100, new Rng(2), out var card));
+        Assert.Equal(Rarity.Elite, card.Rarity);
+        Assert.Equal(150, s.Watts);
+        Assert.True(Eco.BoostActive(s, T0 + 3600 * 23));
+        Assert.False(Shop.BuyStarter(s, Offers, T0 + 200, new Rng(2), out _));
+        var late = new PlayerState { SessionCount = 2 };
+        Offers.TryStartStarter(late, T0);
+        Assert.False(Shop.BuyStarter(late, Offers, T0 + 49 * 3600, new Rng(2), out _));
+    }
+
+    [Fact]
+    public void Daily_login_pays_once_per_day()
+    {
+        var s = new PlayerState();
+        Assert.Equal(10, Shop.ClaimDailyLogin(s, T0));
+        Assert.Equal(0, Shop.ClaimDailyLogin(s, T0 + 60));
+        Assert.Equal(10, Shop.ClaimDailyLogin(s, T0 + 86400));
+        Assert.Equal(20, s.Watts);
+    }
+
+    [Fact]
+    public void Season_pass_progresses_with_races_and_rewards_are_claimed_once()
+    {
+        var s = new PlayerState();
+        Shop.EnsureSeason(s, T0);
+        Assert.Equal(0, Shop.PassTierReached(s));
+        Assert.False(Shop.CanClaimPass(s, 1, false));
+        s.PassRaces = 6 * 5;
+        Assert.Equal(5, Shop.PassTierReached(s));
+        Assert.True(Shop.ClaimPass(s, 1, false, T0, new Rng(1)));
+        Assert.False(Shop.ClaimPass(s, 1, false, T0, new Rng(1)));      // une seule fois
+        Assert.True(s.Primes > Echappee.Numbers.BigAmount.Zero);
+        long w = s.Watts;
+        Assert.True(Shop.ClaimPass(s, 5, false, T0, new Rng(1)));        // palier 5 = Watts
+        Assert.Equal(w + 20, s.Watts);
+        Assert.False(Shop.ClaimPass(s, 2, true, T0, new Rng(1)));        // piste premium verrouillée
+        Shop.BuyPass(s);
+        Assert.True(Shop.ClaimPass(s, 2, true, T0, new Rng(1)));
+        Assert.False(Shop.ClaimPass(s, 6, false, T0, new Rng(1)));       // palier pas encore atteint
+    }
+
+    [Fact]
+    public void Season_pass_final_tier_gives_a_legend_and_a_new_season_resets()
+    {
+        var s = new PlayerState(); Shop.EnsureSeason(s, T0); Shop.BuyPass(s);
+        s.PassRaces = 6 * 30 + 3;
+        Assert.Equal(30, Shop.PassTierReached(s));
+        Assert.True(Shop.ClaimPass(s, 30, true, T0, new Rng(3)));
+        Assert.Contains(s.Cards.Keys, id => D.Riders.First(r => r.Id == id).Rarity == Rarity.Legende);
+        Shop.EnsureSeason(s, T0 + 28 * 86400 + 1);
+        Assert.Equal(0, s.PassRaces); Assert.False(s.PassPremium);
     }
 }

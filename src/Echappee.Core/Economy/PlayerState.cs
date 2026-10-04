@@ -52,6 +52,17 @@ namespace Echappee.Economy
 
         // ligue
         public int LeagueTier;
+        public int BestLeagueTier;
+
+        // boutique
+        public long PassStartUnix;                  // 0 = pas de saison en cours
+        public bool PassPremium;
+        public int PassRaces;
+        public List<int> PassClaimedFree = new List<int>();
+        public List<int> PassClaimedPremium = new List<int>();
+        public List<string> UnlockedPatterns = new List<string>();
+        public int LastLoginDay = -1;
+        public string SelectedDiscipline = "route";
 
         public int InfraLevel(string id) => InfraLevels.TryGetValue(id, out var l) ? l : 0;
 

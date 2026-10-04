@@ -217,7 +217,12 @@
       0
     ],
     "RiderLevelCap": 10,
-    "LevelStatBonusPct": 3
+    "LevelStatBonusPct": 3,
+    "PromotionWatts": 60,
+    "DailyLoginWatts": 10,
+    "StartingStarters": 4,
+    "BotLevelBase": 40,
+    "BotLevelPerTier": 6
   },
   "Rarities": {
     "Amateur": {
@@ -352,5 +357,58 @@
       "BE"
     ],
     "MinimumAge": 12
+  },
+  "Shop": {
+    "WattsPacks": [
+      {
+        "Id": "w1",
+        "Name": "Poignée de Watts",
+        "Watts": 150,
+        "PriceEur": 0.99
+      },
+      {
+        "Id": "w2",
+        "Name": "Sac de Watts",
+        "Watts": 700,
+        "PriceEur": 4.99
+      },
+      {
+        "Id": "w3",
+        "Name": "Caisse de Watts",
+        "Watts": 1500,
+        "PriceEur": 9.99
+      },
+      {
+        "Id": "w4",
+        "Name": "Coffre de Watts",
+        "Watts": 3200,
+        "PriceEur": 19.99
+      },
+      {
+        "Id": "w5",
+        "Name": "Camion de Watts",
+        "Watts": 8500,
+        "PriceEur": 49.99
+      },
+      {
+        "Id": "w6",
+        "Name": "Centrale de Watts",
+        "Watts": 18000,
+        "PriceEur": 99.99
+      }
+    ],
+    "StarterPriceEur": 2.99,
+    "StarterWatts": 150,
+    "StarterBoostHours": 24,
+    "NoAdsPriceEur": 4.99,
+    "SeasonPassPriceEur": 4.99,
+    "SeasonPassTiers": 30,
+    "SeasonPassDays": 28,
+    "PassRacesPerTier": 6,
+    "PassFreeWattsEvery": 5,
+    "PassFreeWatts": 20,
+    "PassPremiumWattsPerTier": 10,
+    "PassFreePrimesMinutes": 10,
+    "StudioPremiumPriceEur": 1.99
   }
 }
