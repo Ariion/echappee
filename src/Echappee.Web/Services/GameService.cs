@@ -26,6 +26,8 @@ public sealed class RaceSession
     public RiderCardDef CardWon;
     public bool Won => Rank == 1;
     public double LeaderTime => Result.Standings[0].FinishTime;
+    public double End => Math.Min(Result.Duration, LeaderTime + 4);
+    public double Meters;
 }
 
 public sealed class LeagueResult { public LeagueOutcome Outcome; public int Rank; public int FromTier, ToTier; public int Watts; }
@@ -74,6 +76,8 @@ public sealed class GameService
     public List<PackPull> LastPulls;
     public string LastPackKey;
     public string Toast;
+    public bool ViewAttached;         // le canvas est affiché : c'est lui qui donne l'heure de la course
+    DotNetObjectReference<GameService> _self;
     double _toastLeft, _secAcc, _saveAcc;
 
     public event Action Changed;
@@ -182,10 +186,10 @@ public sealed class GameService
         if (!Ready) return;
         bool changed = false;
         if (_toastLeft > 0) { _toastLeft -= dt; if (_toastLeft <= 0) { Toast = null; changed = true; } }
-        if (Race != null && !Race.Finished)
+        if (Race != null && !Race.Finished && !ViewAttached)
         {
             Race.Elapsed += dt * Race.Speed;
-            if (Race.Elapsed >= Math.Min(Race.Result.Duration, Race.LeaderTime + 4)) FinishRace();
+            if (Race.Elapsed >= Race.End) FinishRace();
             changed = true;
         }
         _secAcc += dt;
@@ -227,7 +231,9 @@ public sealed class GameService
         ulong seed = Rng.NextULong();
         var field = BotTeams.Field(cfg, player, BotLevel, seed ^ 0x5DEECE66DUL);
         var res = new RaceSimulator(cfg).Run(field, Data.Courses[disc.Circuit], disc, seed, recordFrames: true);
-        Race = new RaceSession { Result = res, Field = field, DiscKey = key, Disc = disc, Rank = res.PlayerRank };
+        Race = new RaceSession { Result = res, Field = field, DiscKey = key, Disc = disc, Rank = res.PlayerRank,
+                                 Meters = new RaceSimulator(cfg).FitCourseMeters(Data.Courses[disc.Circuit], disc) };
+        _ = _js.InvokeVoidAsync("ech.race.play", RacePayload(Race, false));
         Notify();
     }
 
@@ -253,9 +259,113 @@ public sealed class GameService
         _ = SaveAsync();
     }
 
-    public void SkipRace() { if (InRace) { Race.Elapsed = Race.Result.Duration; } }
-    public void SetSpeed(double s) { if (Race != null) Race.Speed = s; Notify(); }
-    public void CloseRace() { if (Race != null && Race.Finished) { Race = null; Notify(); } }
+    public void SkipRace()
+    {
+        if (!InRace) return;
+        Race.Elapsed = Race.End;
+        if (ViewAttached) _ = _js.InvokeVoidAsync("ech.race.skip"); else FinishRace();
+        Notify();
+    }
+
+    public void SetSpeed(double s) { if (Race != null) Race.Speed = s; _ = _js.InvokeVoidAsync("ech.race.setSpeed", s); Notify(); }
+
+    public void CloseRace()
+    {
+        if (Race == null || !Race.Finished) return;
+        Race = null;
+        _ = _js.InvokeVoidAsync("ech.race.idle", RacePayload(null, true));
+        Notify();
+    }
+
+    // ------------------------------------------------------------ pont avec le canvas de course
+
+    [JSInvokable]
+    public void OnRaceTick(double elapsed, bool done)
+    {
+        if (Race == null || Race.Finished) return;
+        Race.Elapsed = elapsed;
+        if (done || elapsed >= Race.End) FinishRace();
+        Notify();
+    }
+
+    static readonly string[][] BotColors =
+    {
+        new[]{"#3C5BFF","#FFC933"}, new[]{"#FF4F8B","#FFFFFF"}, new[]{"#FFC933","#141A33"}, new[]{"#FF8A3D","#FFFFFF"},
+        new[]{"#8A5CF6","#FFC933"}, new[]{"#22D3EE","#141A33"}, new[]{"#F5F7FF","#FF4F8B"}, new[]{"#141A33","#FFC933"},
+        new[]{"#A3E635","#141A33"}, new[]{"#E11D48","#FFFFFF"}, new[]{"#64748B","#FFC933"}
+    };
+
+    public string SceneJson()
+    {
+        var disc = Data.Balance.Disciplines[Race?.DiscKey ?? S.SelectedDiscipline];
+        var course = Data.Courses[disc.Circuit];
+        var segs = new List<object>(); double acc = 0;
+        foreach (var s in course.Segments) { segs.Add(new { from = acc / 100, to = (acc + s.LengthPct) / 100, type = s.Type.ToString() }); acc += s.LengthPct; }
+        return JsonConvert.SerializeObject(new { samples = Track.Samples(360), segments = segs });
+    }
+
+    /// <summary>Données du canvas : la course jouée, ou la grille de départ au repos.</summary>
+    public string RacePayload(RaceSession r, bool idle)
+    {
+        int n = r?.Field.Count ?? Data.Balance.Race.Teams;
+        int per = Data.Balance.Race.StartersPerTeam;
+        var teams = new List<object>();
+        for (int k = 0; k < n; k++)
+        {
+            string b = k == 0 ? JerseyDesign.SafeColor(Jersey.Base, "#3C5BFF") : BotColors[(k - 1) % BotColors.Length][0];
+            string a = k == 0 ? JerseyDesign.SafeColor(Jersey.Accent, "#FFC933") : BotColors[(k - 1) % BotColors.Length][1];
+            var names = r != null ? r.Field[k].Starters.Select(x => x.Name).ToList() : Enumerable.Range(0, per).Select(i => "").ToList();
+            while (names.Count < per) names.Add("");
+            var attacks = new List<object>();
+            if (r != null)
+                foreach (var e in r.Result.Events.Where(e => e.Team == k && (e.Kind == EventKind.Attack || e.Kind == EventKind.PlanRule)))
+                {
+                    int who = 0;
+                    var starters = r.Field[k].Starters;
+                    if (e.Kind == EventKind.Attack) who = Math.Max(0, starters.FindIndex(x => x.Name == e.Rider));
+                    else if (e.Action == ActionKind.ClimberAttacks) who = BestIndex(starters, x => x.Stats.Climb);
+                    else if (e.Action == ActionKind.SprinterLaunch) who = BestIndex(starters, x => x.Stats.Sprint);
+                    else continue;
+                    attacks.Add(new { t = Math.Round(e.Time, 1), rider = who });
+                }
+            teams.Add(new { name = r?.Field[k].Name ?? "", @base = b, accent = a, riders = names, attacks });
+        }
+        object frames = idle || r == null ? new[] { new float[n], new float[n], new float[n] }
+            : r.Result.Frames.Select(f => f.Positions.Select(v => (float)Math.Round(v, 4)).ToArray()).ToArray();
+        var finish = new List<double>();
+        for (int k = 0; k < n; k++)
+        {
+            var st = r?.Result.ByTeam(k);
+            finish.Add(st == null || double.IsInfinity(st.FinishTime) ? 1e9 : Math.Round(st.FinishTime, 2));
+        }
+        return JsonConvert.SerializeObject(new
+        {
+            idle = idle || r == null, teams, frames, finish, snap = Data.Balance.Race.SnapshotEverySeconds,
+            meters = r?.Meters ?? 1000.0, end = r?.End ?? 60.0, attackDur = Data.Balance.Race.AttackDurationS,
+            startAt = r?.Elapsed ?? 0, meLabel = T("ui.me")
+        });
+    }
+
+    static int BestIndex(List<Rider> l, Func<Rider, double> f)
+    {
+        int best = 0;
+        for (int i = 1; i < l.Count; i++) if (f(l[i]) > f(l[best])) best = i;
+        return best;
+    }
+
+    public async Task AttachRaceViewAsync(Microsoft.AspNetCore.Components.ElementReference canvas)
+    {
+        _self ??= DotNetObjectReference.Create(this);
+        await _js.InvokeVoidAsync("ech.race.attach", canvas, SceneJson(), _self, Race == null ? RacePayload(null, true) : null);
+        if (Race != null) await _js.InvokeVoidAsync("ech.race.seek", Race.Elapsed);
+        ViewAttached = true;
+    }
+
+    public async Task DetachRaceViewAsync()
+    {
+        ViewAttached = false;
+        try { await _js.InvokeVoidAsync("ech.race.detach"); } catch { }
+    }
 
     public string PosterSvg()
     {

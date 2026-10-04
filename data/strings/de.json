@@ -170,5 +170,9 @@
  "daily.title": "Tagesbonus",
  "video.title": "Bonusvideo",
  "video.sim": "Simulierte Werbung (keine echte). Bitte warten…",
- "plan.recommended": "Empfohlenen Plan nutzen"
+ "plan.recommended": "Empfohlenen Plan nutzen",
+ "seg.Climb": "Anstieg",
+ "seg.Descent": "Abfahrt",
+ "seg.Technical": "Technisch",
+ "seg.Sprint": "Sprint"
 }

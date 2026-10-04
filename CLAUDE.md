@@ -101,6 +101,7 @@ Critère de sortie de l'étape 2 : 5 personnes regardent la course 60 secondes s
 
 ## Organisation du dépôt et commandes
 - `src/Echappee.Web` : l'application (Blazor WASM). `Services/GameService.cs` relie le cœur à l'interface ; `Components/*.razor` = un écran chacun ; `wwwroot/css/app.css` = direction artistique ; `wwwroot/data/` est copié depuis `data/` au build (ne pas y éditer).
+- La course est dessinée sur un canvas par `wwwroot/js/raceview.js` (60 images/s, caméra qui suit le peloton, 5 coureurs par équipe en formation). Règle : ne jamais étirer les écarts par rapport au leader (un coureur plus lent que le leader reculerait) ; les positions viennent de la simulation, la formation n'ajoute que de petits décalages continus. Le test e2e vérifie qu'aucun coureur ne recule.
 - Tout texte visible passe par `T("clé")` et existe dans les 6 fichiers `data/strings/*.json` (un test vérifie la complétude).
 - Test navigateur : `tests/e2e/smoke.js` (voir l'en-tête du fichier). Lancer avant de dire qu'un changement d'interface fonctionne.
 - `src/Echappee.Core` : code C# pur (netstandard2.1, aucun `UnityEngine`). `data/*.json` : équilibrage, circuits, coureurs. `tests/` : xUnit. `tools/Echappee.Cli` : outil d'équilibrage. `unity/` : scripts Unity. `docs/` : concept, décisions (`DECISIONS.md`), coût zéro, légal.

@@ -170,5 +170,9 @@
  "daily.title": "Bônus do dia",
  "video.title": "Vídeo de bônus",
  "video.sim": "Anúncio simulado (não é real). Aguarde…",
- "plan.recommended": "Usar o plano recomendado"
+ "plan.recommended": "Usar o plano recomendado",
+ "seg.Climb": "Subida",
+ "seg.Descent": "Descida",
+ "seg.Technical": "Técnico",
+ "seg.Sprint": "Sprint"
 }
