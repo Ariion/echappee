@@ -1,0 +1,62 @@
+@inherits GameComponent
+
+<section class="screen">
+    <div class="titlebar"><h1>@T("ui.studio")</h1><button class="chipb" @onclick='() => OnNavigate.InvokeAsync("team")'>←</button></div>
+    <div class="stage">
+        <svg viewBox="0 0 100 100" width="180" height="180" role="img" aria-label="@T("ui.studio")">@((MarkupString)G.Jersey.ToSvgGroup("s"))</svg>
+        <small>@G.TeamName</small>
+    </div>
+
+    <label class="fld">@T("studio.name")<input maxlength="22" value="@G.TeamName" @onchange="SetName" /></label>
+    <label class="fld">@T("studio.sponsor")<input maxlength="14" value="@G.Jersey.Sponsor" @onchange="SetSponsor" /></label>
+
+    <h2 class="h">@T("studio.pattern")</h2>
+    <div class="opts">
+        @foreach (JerseyPattern p in Enum.GetValues(typeof(JerseyPattern)))
+        {
+            bool prem = JerseyDesign.IsPremium(p);
+            bool locked = prem && !G.S.UnlockedPatterns.Contains(p.ToString());
+            var j = new JerseyDesign { Pattern = p, Base = G.Jersey.Base, Accent = G.Jersey.Accent, Band = G.Jersey.Band };
+            <button class="opt @(G.Jersey.Pattern == p ? "sel" : "")" @onclick="() => Pick(p, locked)" aria-label="@p">
+                <svg viewBox="0 0 100 100">@((MarkupString)j.ToSvgGroup("o" + (int)p))</svg>
+                @if (locked) { <svg class="ic lk"><use href="#i-lock"/></svg> }
+            </button>
+        }
+    </div>
+    @if (JerseyDesign.IsPremium(G.Jersey.Pattern) || G.Data.Balance.Shop.StudioPremiumPriceEur > 0)
+    {
+        <p class="hint">@T("studio.premiumHint", Money(G.Data.Balance.Shop.StudioPremiumPriceEur))</p>
+    }
+
+    <h2 class="h">@T("studio.colors")</h2>
+    <div class="cols">
+        <label>@T("studio.base")<input type="color" value="@G.Jersey.Base" @onchange="e => SetColor(0, e)" /></label>
+        <label>@T("studio.accent")<input type="color" value="@G.Jersey.Accent" @onchange="e => SetColor(1, e)" /></label>
+        <label>@T("studio.band")<input type="color" value="@G.Jersey.Band" @onchange="e => SetColor(2, e)" /></label>
+    </div>
+</section>
+
+@code {
+    [Parameter] public EventCallback<string> OnNavigate { get; set; }
+    void SetName(ChangeEventArgs e) { var n = (e.Value?.ToString() ?? "").Trim(); G.TeamName = n.Length == 0 ? "Cadence Mistral" : n; Commit(); }
+    void SetSponsor(ChangeEventArgs e) { G.Jersey.Sponsor = e.Value?.ToString() ?? ""; Commit(); }
+    void SetColor(int which, ChangeEventArgs e)
+    {
+        var v = e.Value?.ToString();
+        if (which == 0) G.Jersey.Base = JerseyDesign.SafeColor(v, G.Jersey.Base);
+        else if (which == 1) G.Jersey.Accent = JerseyDesign.SafeColor(v, G.Jersey.Accent);
+        else G.Jersey.Band = JerseyDesign.SafeColor(v, G.Jersey.Band);
+        Commit();
+    }
+    void Commit() { _ = G.SaveAsync(); G.Notify(); }
+    void Pick(JerseyPattern p, bool locked)
+    {
+        if (locked)
+        {
+            if (!G.TestMode) { G.ShowToast(T("msg.soon")); return; }
+            G.Shop.BuyStudioPattern(G.S, p.ToString());
+            G.ShowToast(T("msg.testPurchase"));
+        }
+        G.Jersey.Pattern = p; Commit();
+    }
+}

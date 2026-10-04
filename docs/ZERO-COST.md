@@ -1,5 +1,8 @@
 # Plan à zéro euro
 
+> **Mise à jour :** le jeu est maintenant une application web installable (PWA). Elle se publie **gratuitement sur GitHub Pages**, sans compte Google Play ni Apple. Le tableau « Ce qui n'est pas gratuit » ne concerne donc que la sortie dans les magasins, qui devient optionnelle.
+
+
 Objectif : tout faire nous-mêmes, sans rien payer en dehors de ce qui est imposé par les magasins d'applications.
 
 ## Ce qui est gratuit (et ce qu'on utilise)
@@ -32,6 +35,13 @@ Les montants des stores changent : à revérifier avant paiement.
 - **Cloud Functions** (Firebase) : exigent la formule payante Blaze. Les ligues restent donc **simulées côté appareil** (équipes fantômes calculées localement), sans serveur. Les « fantômes de vrais joueurs » viendront plus tard, avec Firestore seul, si besoin.
 - **Budget de lancement de 12 000 €** (publicité payante, créateurs, juridique, musique, traductions) : remplacé par du travail à la main et des ressources libres. **Pas de publicité payante.**
 - **Vérification juridique par un professionnel** : remplacée par un garde-fou technique (blocage des packs payants par pays, réglable à distance) et par `docs/LEGAL.md`. Ce n'est pas un avis juridique.
+
+## Ce que la version web ne fait pas (et ce que ça demande)
+
+- **Vraie publicité** : un réseau publicitaire web (par exemple AdSense) demande l'ouverture d'un compte par une personne réelle, avec validation du site. Dans l'app, les vidéos « récompensées » sont donc **simulées** et clairement indiquées comme telles.
+- **Vrais paiements** : il faut un prestataire de paiement (par exemple Stripe : pas d'abonnement, commission à la transaction) et une identité / un compte bancaire au nom du propriétaire. Je ne peux ni ouvrir ces comptes ni accepter des conditions à ta place. Tant que ce n'est pas fait, les achats sont des essais sans argent réel (mode test).
+- **Notifications push** : peu fiables sur iOS pour une PWA.
+- **Sauvegarde** : locale à l'appareil (navigateur). Pas de compte ni de synchronisation entre appareils pour l'instant ; export manuel dans Réglages.
 
 ## Conséquence honnête sur les prévisions
 

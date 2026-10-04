@@ -1,0 +1,93 @@
+@inherits GameComponent
+
+<section class="screen">
+    <div class="titlebar"><h1>@T("ui.shop")</h1></div>
+    @if (G.TestMode) { <div class="testbanner">@T("shop.testMode")</div> }
+
+    @if (G.Offers.IsStarterActive(G.S, G.Now))
+    {
+        <div class="offer">
+            <h4>@T("offer.starter")</h4>
+            <p>@T("offer.starterText", G.Data.Balance.Shop.StarterWatts, (int)G.Data.Balance.Shop.StarterBoostHours)</p>
+            <div class="row2"><div class="timer">@Dur(G.Offers.StarterSecondsLeft(G.S, G.Now))</div>
+                <button class="btn y" @onclick="BuyStarter">@Money(G.Data.Balance.Shop.StarterPriceEur)</button></div>
+        </div>
+    }
+
+    @if (G.Offers.ShouldShow(OfferKind.LimitedOffer, G.S, G.Now))
+    {
+        <h2 class="h">@T("offer.limited")</h2>
+        <div class="w3">
+            @foreach (var o in G.Data.Balance.Shop.LimitedOffers)
+            {
+                <div class="card c"><svg class="ic w"><use href="#i-bolt"/></svg><b>@o.Watts</b><button class="btn sm" @onclick="() => Buy(() => G.Shop.BuyLimited(G.S, o.Id, G.Now))">@Money(o.PriceEur)</button></div>
+            }
+        </div>
+    }
+
+    <div class="strip">
+        <svg class="ic"><use href="#i-trophy"/></svg>
+        <div><b>@T("offer.pass")</b><small>@G.Shop.PassTierReached(G.S) / @G.Data.Balance.Shop.SeasonPassTiers · @Dur(G.Shop.PassSecondsLeft(G.S, G.Now))</small></div>
+        @if (!G.S.PassPremium) { <button class="btn y sm" @onclick="() => Buy(() => G.Shop.BuyPass(G.S))">@Money(G.Data.Balance.Shop.SeasonPassPriceEur)</button> }
+        else { <span class="tier t-l">Premium</span> }
+    </div>
+    <div class="pass">
+        @for (int t = 1; t <= G.Data.Balance.Shop.SeasonPassTiers; t++)
+        {
+            int tier = t;
+            bool reached = tier <= G.Shop.PassTierReached(G.S);
+            <div class="pt @(reached ? "ok" : "")">
+                <small>@tier</small>
+                <button class="chipb @(G.S.PassClaimedFree.Contains(tier) ? "done" : "")" disabled="@(!G.Shop.CanClaimPass(G.S, tier, false))" @onclick="() => Claim(tier, false)">@Reward(tier, false)</button>
+                <button class="chipb prem @(G.S.PassClaimedPremium.Contains(tier) ? "done" : "")" disabled="@(!G.Shop.CanClaimPass(G.S, tier, true))" @onclick="() => Claim(tier, true)">@Reward(tier, true)</button>
+            </div>
+        }
+    </div>
+    <p class="hint">@T("pass.hint", G.Data.Balance.Shop.PassRacesPerTier)</p>
+
+    <div class="strip">
+        <svg class="ic"><use href="#i-play"/></svg>
+        <div><b>@T("shop.noAds")</b><small>@T("shop.noAdsText")</small></div>
+        @if (G.S.NoAds) { <span class="tier t-p">✓</span> }
+        else { <button class="btn y sm" @onclick="() => Buy(() => G.Shop.BuyNoAds(G.S))">@Money(G.Data.Balance.Shop.NoAdsPriceEur)</button> }
+    </div>
+
+    <div class="strip">
+        <svg class="ic w"><use href="#i-bolt"/></svg>
+        <div><b>@T("shop.freeWatts")</b><small>@T("shop.videoNote") · @G.VideoWattsLeft W</small></div>
+        <button class="btn sm" disabled="@(G.VideoWattsLeft < 10)" @onclick="G.VideoWatts">+10 W</button>
+    </div>
+
+    <h2 class="h">Watts</h2>
+    <div class="w3 six">
+        @foreach (var p in G.Data.Balance.Shop.WattsPacks)
+        {
+            <div class="card c"><svg class="ic w"><use href="#i-bolt"/></svg><b>@p.Watts</b><button class="btn sm" @onclick="() => Buy(() => G.Shop.BuyWattsPack(G.S, p.Id))">@Money(p.PriceEur)</button></div>
+        }
+    </div>
+</section>
+
+@code {
+    string Reward(int tier, bool prem)
+    {
+        var r = G.Shop.PassRewardText(tier, prem);
+        return r == "legend" ? "★" : r[0] == 'w' ? r[1..] + "W" : "💰";
+    }
+
+    void Claim(int tier, bool prem)
+    {
+        if (G.Shop.ClaimPass(G.S, tier, prem, G.Now, G.Rng)) { _ = G.SaveAsync(); G.ShowToast(T("msg.claimed")); }
+    }
+
+    void BuyStarter()
+    {
+        if (!G.TestMode) { G.ShowToast(T("msg.soon")); return; }
+        if (G.Shop.BuyStarter(G.S, G.Offers, G.Now, G.Rng, out var card)) { G.ShowToast(T("msg.starterBought", card.Name)); _ = G.SaveAsync(); }
+    }
+
+    void Buy(Func<bool> action)
+    {
+        if (!G.TestMode) { G.ShowToast(T("msg.soon")); return; }
+        if (action()) { G.ShowToast(T("msg.testPurchase")); _ = G.SaveAsync(); G.Notify(); }
+    }
+}

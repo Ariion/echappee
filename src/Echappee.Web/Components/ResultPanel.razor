@@ -1,0 +1,29 @@
+@inherits GameComponent
+
+<div class="result">
+    <div class="rank">@(G.Race.Rank) / @G.Race.Field.Count</div>
+    <div class="rows">
+        <div><span>@T("ui.primes")</span><b>+@G.Fmt(G.Race.Reward.Primes)</b></div>
+        <div><span>@T("ui.leaguePts")</span><b>+@G.Race.Reward.LeaguePoints</b></div>
+        @if (G.Race.CardWon != null)
+        {
+            <div class="won"><span>@T("ui.newCard")</span><b>@G.Race.CardWon.Name · @RarityName(G.Race.CardWon.Rarity)</b></div>
+        }
+    </div>
+    <div class="row2">
+        <button class="btn" @onclick="G.CloseRace">@T("btn.next")</button>
+        @if (G.Race.Won)
+        {
+            <button class="btn pink" @onclick="() => poster = true">@T("ui.poster")</button>
+        }
+    </div>
+</div>
+
+@if (poster)
+{
+    <PosterModal OnClose="() => poster = false" />
+}
+
+@code {
+    bool poster;
+}

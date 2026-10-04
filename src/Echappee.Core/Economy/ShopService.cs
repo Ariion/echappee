@@ -40,6 +40,15 @@ namespace Echappee.Economy
             return true;
         }
 
+        /// <summary>Offre limitée : au plus une par semaine (la politique d'offres décide quand l'afficher).</summary>
+        public bool BuyLimited(PlayerState s, string id, long now)
+        {
+            var o = _cfg.Shop.LimitedOffers.FirstOrDefault(x => x.Id == id);
+            if (o == null) return false;
+            s.Watts += o.Watts; s.LastLimitedOfferUnix = now; s.EverPurchased = true;
+            return true;
+        }
+
         public bool BuyNoAds(PlayerState s) { s.NoAds = true; s.EverPurchased = true; return true; }
 
         public bool BuyStudioPattern(PlayerState s, string pattern)
@@ -65,7 +74,8 @@ namespace Echappee.Economy
             s.FirstPlayUnix = now; s.LastSeenUnix = now; s.SessionCount = 1;
             for (int i = 0; i < _cfg.Economy.StartingStarters; i++) s.Starters.Add(GrantRandom(s, Rarity.Amateur, rng).Id);
             s.Starters.Add(GrantRandom(s, Rarity.Elite, rng).Id);
-            s.Watts = 30;
+            s.Watts = _cfg.Economy.StartingWatts;
+            s.Primes = new Numbers.BigAmount(_cfg.Economy.StartingPrimes);
         }
 
         /// <summary>Bonus de connexion quotidien. Renvoie les Watts gagnés (0 si déjà pris aujourd'hui).</summary>

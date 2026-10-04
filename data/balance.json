@@ -222,7 +222,9 @@
     "DailyLoginWatts": 10,
     "StartingStarters": 4,
     "BotLevelBase": 40,
-    "BotLevelPerTier": 6
+    "BotLevelPerTier": 6,
+    "StartingPrimes": 15,
+    "StartingWatts": 30
   },
   "Rarities": {
     "Amateur": {
@@ -409,6 +411,26 @@
     "PassFreeWatts": 20,
     "PassPremiumWattsPerTier": 10,
     "PassFreePrimesMinutes": 10,
-    "StudioPremiumPriceEur": 1.99
+    "StudioPremiumPriceEur": 1.99,
+    "LimitedOffers": [
+      {
+        "Id": "l1",
+        "Name": "Offre éclair",
+        "Watts": 900,
+        "PriceEur": 4.99
+      },
+      {
+        "Id": "l2",
+        "Name": "Offre éclair+",
+        "Watts": 1500,
+        "PriceEur": 7.99
+      },
+      {
+        "Id": "l3",
+        "Name": "Offre éclair max",
+        "Watts": 2100,
+        "PriceEur": 9.99
+      }
+    ]
   }
 }

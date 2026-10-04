@@ -128,7 +128,18 @@ namespace Echappee.Numbers
         public static BigAmount Min(BigAmount a, BigAmount b) => a <= b ? a : b;
 
         /// <summary>Affichage compact : 999, 1,26K, 22,5K, 3,40M... puis aa, ab... puis notation scientifique.</summary>
-        public string ToString(CultureInfo culture)
+        public string ToString(CultureInfo culture) => Format(culture, null);
+
+        /// <summary>Même affichage avec un séparateur décimal choisi (',' ou '.'), sans dépendre des données de culture du navigateur.</summary>
+        public string ToString(string decimalSeparator) => Format(CultureInfo.InvariantCulture, decimalSeparator);
+
+        string Format(CultureInfo culture, string sep)
+        {
+            string r = FormatCore(culture);
+            return sep == null || sep == "." ? r : r.Replace(".", sep);
+        }
+
+        string FormatCore(CultureInfo culture)
         {
             if (IsZero) return "0";
             if (Exponent < 3)

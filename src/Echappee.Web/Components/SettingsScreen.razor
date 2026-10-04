@@ -1,0 +1,35 @@
+@inherits GameComponent
+
+<section class="screen">
+    <div class="titlebar"><h1>@T("ui.settings")</h1><button class="chipb" @onclick='() => OnNavigate.InvokeAsync("race")'>←</button></div>
+
+    <label class="fld">@T("set.language")
+        <select @onchange="SetLang">
+            @foreach (var l in Localizer.Languages) { <option value="@l" selected="@(G.Language == l)">@Name(l)</option> }
+        </select>
+    </label>
+
+    <label class="check"><input type="checkbox" checked="@G.TestMode" @onchange="e => { G.TestMode = (bool)e.Value; G.Notify(); }" /> @T("set.testMode")</label>
+    <p class="hint">@T("set.testModeHint")</p>
+
+    <button class="btn ghost full" @onclick="Export">@T("set.export")</button>
+    <button class="btn ghost full" @onclick="() => confirm = true">@T("set.reset")</button>
+    @if (confirm)
+    {
+        <div class="testbanner">@T("set.resetConfirm")
+            <div class="row2"><button class="btn pink" @onclick="Reset">@T("btn.yes")</button><button class="btn ghost" @onclick="() => confirm = false">@T("btn.no")</button></div></div>
+    }
+
+    <h2 class="h">@T("set.about")</h2>
+    <p class="hint">@T("set.aboutText")</p>
+    <p class="hint">@T("set.adsNote")</p>
+</section>
+
+@code {
+    [Parameter] public EventCallback<string> OnNavigate { get; set; }
+    bool confirm;
+    static string Name(string l) => l switch { "fr" => "Français", "en" => "English", "es" => "Español", "pt" => "Português", "it" => "Italiano", _ => "Deutsch" };
+    void SetLang(ChangeEventArgs e) { G.Language = e.Value?.ToString() ?? "fr"; G.Loc.Language = G.Language; _ = G.SaveAsync(); G.Notify(); }
+    async Task Export() => await G.Download("echappee-sauvegarde.json", G.ExportSave());
+    async Task Reset() { confirm = false; await G.ResetAsync(); await OnNavigate.InvokeAsync("race"); }
+}

@@ -453,6 +453,8 @@ public class ShopTests
         var s = new PlayerState();
         Shop.NewGame(s, T0, new Rng(1));
         Assert.Equal(5, s.Starters.Count);
+        Assert.Equal(15, s.Primes.ToDouble(), 6);   // de quoi acheter la première amélioration tout de suite
+        Assert.True(Eco.TryUpgrade(s, "sponsors"));
         var team = Packs.BuildTeam(s, "p", "Moi");
         Assert.Equal(5, team.Starters.Count);
         Assert.Equal(1, team.Starters.Count(r => r.Rarity == Rarity.Elite));
@@ -525,5 +527,26 @@ public class ShopTests
         Assert.Contains(s.Cards.Keys, id => D.Riders.First(r => r.Id == id).Rarity == Rarity.Legende);
         Shop.EnsureSeason(s, T0 + 28 * 86400 + 1);
         Assert.Equal(0, s.PassRaces); Assert.False(s.PassPremium);
+    }
+}
+
+public class LimitedOfferTests
+{
+    [Fact]
+    public void Limited_offer_pays_watts_and_blocks_another_for_a_week()
+    {
+        var d = TestData.Load();
+        var eco = new EconomyService(d.Balance); var packs = new PackService(d);
+        var shop = new ShopService(d, eco, packs); var offers = new OfferPolicy(d.Balance);
+        const long t0 = 1_800_000_000;
+        var s = new PlayerState { FirstPlayUnix = t0 };
+        long day8 = t0 + 8 * 86400;
+        Assert.True(offers.ShouldShow(OfferKind.LimitedOffer, s, day8));
+        Assert.Equal(3, d.Balance.Shop.LimitedOffers.Count);
+        Assert.True(shop.BuyLimited(s, "l1", day8));
+        Assert.Equal(900, s.Watts);
+        Assert.False(offers.ShouldShow(OfferKind.LimitedOffer, s, day8 + 3 * 86400));
+        Assert.True(offers.ShouldShow(OfferKind.LimitedOffer, s, day8 + 7 * 86400));
+        Assert.False(shop.BuyLimited(s, "zz", day8));
     }
 }

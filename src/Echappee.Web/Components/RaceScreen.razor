@@ -1,0 +1,187 @@
+@inherits GameComponent
+
+<section class="screen">
+    <div class="race-card">
+        @if (G.Race == null)
+        {
+            <div class="hud">
+                <div>@T("ui.me")<b>@Power()</b></div>
+                <div class="mid">@T("disc." + G.S.SelectedDiscipline)<b>@G.Data.Balance.Disciplines[G.S.SelectedDiscipline].DurationSeconds s</b></div>
+                <div class="r">@T("tier." + G.S.LeagueTier)<b>&nbsp;</b></div>
+            </div>
+        }
+        else
+        {
+            var (rank, lead, order) = Standing();
+            <div class="hud">
+                <div>@T("ui.me")<b>@(Power())</b></div>
+                <div class="mid">P@(rank) / @G.Race.Field.Count<b>@Clock()</b></div>
+                <div class="r">@G.Race.Field[lead].Name<b>&nbsp;</b></div>
+            </div>
+        }
+        <svg viewBox="0 0 200 150" class="track" role="img" aria-label="@T("ui.race")">
+            <path d="@Track.PathD" fill="none" stroke="#2C3563" stroke-width="13" stroke-linejoin="round"/>
+            @foreach (var (pts, color) in SegmentLines())
+            {
+                <polyline points="@pts" fill="none" stroke="@color" stroke-width="2.6" stroke-linecap="round" opacity=".9"/>
+            }
+            <path d="@Track.PathD" fill="none" stroke="#EEF2F8" stroke-width="1" stroke-dasharray="3 5" opacity=".35"/>
+            @{ var f = Track.At(0, 0); }
+            <circle cx="@F(f.x)" cy="@F(f.y)" r="2" fill="#EEF2F8"/>
+            @foreach (var d in Dots())
+            {
+                <circle cx="@F(d.x)" cy="@F(d.y)" r="@(d.me ? "4.6" : "3.3")" fill="@d.color" stroke="@(d.me ? "#fff" : "#EEF2F8")" stroke-width="@(d.me ? "1.6" : ".8")"/>
+            }
+        </svg>
+        <div class="ticker">
+            @if (G.Race == null) { <div>@T("msg.readyToRace")</div> }
+            else
+            {
+                @foreach (var line in Ticker()) { <div>@line</div> }
+            }
+        </div>
+
+        @if (G.Race == null)
+        {
+            <button class="btn big" @onclick="G.StartRace">@T("btn.start")</button>
+            <div class="row2">
+                <button class="btn ghost" @onclick='() => OnNavigate.InvokeAsync("disc")'>@T("ui.disc")</button>
+                <button class="btn ghost" disabled="@(!G.Ads.CanOfferRewardedVideo(false))" @onclick="G.VideoBoost">@T("btn.boost")</button>
+            </div>
+        }
+        else if (!G.Race.Finished)
+        {
+            <div class="row2">
+                <button class="btn ghost @(G.Race.Speed == 1 ? "sel" : "")" @onclick="() => G.SetSpeed(1)">×1</button>
+                <button class="btn ghost @(G.Race.Speed == 2 ? "sel" : "")" @onclick="() => G.SetSpeed(2)">×2</button>
+                <button class="btn ghost" @onclick="G.SkipRace">@T("btn.skip")</button>
+            </div>
+        }
+        else
+        {
+            <ResultPanel />
+        }
+    </div>
+
+    @if (G.Race == null || G.Race.Finished)
+    {
+        <h2 class="h">@T("ui.infra")</h2>
+        <div class="mult">
+            @foreach (var m in new[] { 1, 10, 0 })
+            {
+                <button class="chipb @(mult == m ? "sel" : "")" @onclick="() => mult = m">@(m == 0 ? "MAX" : "×" + m)</button>
+            }
+        </div>
+        <div class="infra">
+            @foreach (var inf in G.Data.Balance.Infrastructures)
+            {
+                int lvl = G.S.InfraLevel(inf.Id);
+                var cost = G.Eco.UpgradeCost(inf, lvl);
+                int n = mult == 0 ? Math.Max(1, G.Eco.MaxAffordable(G.S, inf)) : mult;
+                var total = TotalCost(inf, lvl, n);
+                bool can = G.S.Primes >= total;
+                <div class="card">
+                    <h4>@T("infra." + inf.Id)</h4>
+                    <div class="lv">@T("ui.level") @lvl</div>
+                    <span class="up">+@G.Fmt(G.Eco.InfraIncome(inf, lvl)) → +@G.Fmt(G.Eco.InfraIncome(inf, lvl + n))</span>
+                    <button class="btn @(can ? "" : "off")" disabled="@(!can)" @onclick="() => Buy(inf.Id, n)">
+                        <span>@T("btn.upgrade")@(n > 1 ? " ×" + n : "")</span><span class="mono">@G.Fmt(total)</span>
+                    </button>
+                </div>
+            }
+        </div>
+    }
+</section>
+
+@code {
+    [Parameter] public EventCallback<string> OnNavigate { get; set; }
+    int mult = 1;
+    static readonly string[] Colors = { "#1FCB8E", "#3C5BFF", "#FF4F8B", "#FFC933", "#FF8A3D", "#8A5CF6", "#22D3EE", "#F5F7FF", "#A3E635", "#FB7185", "#94A3B8", "#E879F9" };
+
+    static string F(double v) => v.ToString("0.#", System.Globalization.CultureInfo.InvariantCulture);
+
+    int Power() => G.Race != null ? G.Race.Field[0].Power() : G.Packs.BuildTeam(G.S, "p", "p").Power();
+
+    BigAmount TotalCost(InfrastructureConfig inf, int lvl, int n)
+    {
+        var t = BigAmount.Zero;
+        for (int i = 0; i < n; i++) t = t + G.Eco.UpgradeCost(inf, lvl + i);
+        return t;
+    }
+
+    void Buy(string id, int n)
+    {
+        for (int i = 0; i < n; i++) if (!G.Eco.TryUpgrade(G.S, id)) break;
+        G.Notify(); _ = G.SaveAsync();
+    }
+
+    float[] Positions()
+    {
+        var fr = G.Race.Result.Frames;
+        double snap = G.Data.Balance.Race.SnapshotEverySeconds;
+        double t = Math.Min(G.Race.Elapsed, fr[^1].Time);
+        int i = Math.Min(fr.Count - 2, (int)(t / snap));
+        double k = Math.Clamp((t - i * snap) / snap, 0, 1);
+        var a = fr[i].Positions; var b = fr[i + 1].Positions;
+        var r = new float[a.Length];
+        for (int j = 0; j < r.Length; j++) r[j] = (float)(a[j] + (b[j] - a[j]) * k);
+        return r;
+    }
+
+    (int rank, int lead, int[] order) Standing()
+    {
+        var p = Positions();
+        var order = Enumerable.Range(0, p.Length).OrderByDescending(i => p[i]).ToArray();
+        return (Array.IndexOf(order, 0) + 1, order[0], order);
+    }
+
+    string Clock()
+    {
+        double left = Math.Max(0, G.Race.Disc.DurationSeconds - G.Race.Elapsed);
+        return "00:" + ((int)Math.Ceiling(left)).ToString("00");
+    }
+
+    IEnumerable<(double x, double y, string color, bool me)> Dots()
+    {
+        if (G.Race == null)
+        {
+            for (int i = 0; i < 12; i++)
+            {
+                var (x, y) = Track.At(0.0 - i * 0.004, ((i % 4) - 1.5) * 2.4);
+                yield return (x, y, Colors[i], i == 0);
+            }
+            yield break;
+        }
+        var p = Positions();
+        var (_, _, order) = Standing();
+        float lead = p[order[0]];
+        for (int i = 0; i < p.Length; i++)
+        {
+            int rk = Array.IndexOf(order, i);
+            double vis = Math.Max(0, lead - (lead - p[i]) * 4);
+            var (x, y) = Track.At(vis * 0.98, ((rk % 4) - 1.5) * 2.4);
+            yield return (x, y, Colors[i % Colors.Length], i == 0);
+        }
+    }
+
+    IEnumerable<(string, string)> SegmentLines()
+    {
+        var key = G.Race?.DiscKey ?? G.S.SelectedDiscipline;
+        if (!G.Data.Balance.Disciplines.ContainsKey(key)) yield break;
+        var course = G.Data.Courses[G.Data.Balance.Disciplines[key].Circuit];
+        double acc = 0;
+        foreach (var s in course.Segments)
+        {
+            double a = acc / 100.0 * 0.98, b = (acc + s.LengthPct) / 100.0 * 0.98;
+            acc += s.LengthPct;
+            string c = s.Type switch { SegmentType.Climb => "#FF4F8B", SegmentType.Descent => "#1FCB8E", SegmentType.Technical => "#FFC933", SegmentType.Sprint => "#3C5BFF", _ => null };
+            if (c != null) yield return (Track.Polyline(a, b), c);
+        }
+    }
+
+    IEnumerable<string> Ticker()
+    {
+        var evs = G.Race.Result.Events.Where(e => e.Time <= G.Race.Elapsed).TakeLast(3).Reverse();
+        foreach (var e in evs) yield return EventText.Format(e, G.Loc);
+    }
+}

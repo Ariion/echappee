@@ -8,9 +8,9 @@ Course automatique de 60 secondes vue du dessus, revenus passifs, cartes de cour
 
 ## Décisions figées
 - Sport : cyclisme, six disciplines : route, piste, BMX, VTT, cyclo-cross, gravel.
-- Moteur : Unity 6, 2D, C#.
+- Plateforme : **application web installable (PWA)** en Blazor WebAssembly, C#, qui réutilise `Echappee.Core`. Hébergement gratuit (GitHub Pages), installable sur Android et iOS sans magasin d'applications. Unity (dossier `unity/`) reste une option plus tard pour les magasins ; ne plus le développer tant que le web suffit.
 - Backend : Firebase formule Spark gratuite (auth anonyme, Remote Config pour l'économie, Analytics, Firestore au besoin). Pas de Cloud Functions (payantes) : les ligues sont simulées sur l'appareil.
-- Pubs : AdMob seul au début (gratuit). Achats : Unity IAP.
+- Pubs et achats : **simulés** dans la version web (mode test visible). Vraie pub ou vrais paiements = comptes à ouvrir par le propriétaire (voir `docs/ZERO-COST.md`).
 - Budget : zéro euro hors comptes développeur. Tout est fait maison, pas de pub payante. Voir `docs/ZERO-COST.md`.
 - Langue de base : français. Ensuite EN, ES, PT, IT, DE.
 - Ne rien copier d'un jeu existant : ni noms, ni interface, ni icônes, ni textes. Mécaniques génériques seulement.
@@ -100,6 +100,9 @@ Critère de sortie de l'étape 2 : 5 personnes regardent la course 60 secondes s
 - Commits courts, un sujet par commit.
 
 ## Organisation du dépôt et commandes
+- `src/Echappee.Web` : l'application (Blazor WASM). `Services/GameService.cs` relie le cœur à l'interface ; `Components/*.razor` = un écran chacun ; `wwwroot/css/app.css` = direction artistique ; `wwwroot/data/` est copié depuis `data/` au build (ne pas y éditer).
+- Tout texte visible passe par `T("clé")` et existe dans les 6 fichiers `data/strings/*.json` (un test vérifie la complétude).
+- Test navigateur : `tests/e2e/smoke.js` (voir l'en-tête du fichier). Lancer avant de dire qu'un changement d'interface fonctionne.
 - `src/Echappee.Core` : code C# pur (netstandard2.1, aucun `UnityEngine`). `data/*.json` : équilibrage, circuits, coureurs. `tests/` : xUnit. `tools/Echappee.Cli` : outil d'équilibrage. `unity/` : scripts Unity. `docs/` : concept, décisions (`DECISIONS.md`), coût zéro, légal.
 - `dotnet test` doit rester vert avant chaque commit. Un test vérifie qu'aucun prix ni taux n'est en dur dans le cœur.
 - Tout changement de règle ou d'équilibrage : mettre à jour `data/balance.json`, relancer les outils `stats`, `plan`, `eco`, puis `docs/DECISIONS.md` si une règle change.

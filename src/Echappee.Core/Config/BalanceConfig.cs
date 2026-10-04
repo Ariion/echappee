@@ -107,6 +107,8 @@ namespace Echappee.Config
         public double LevelStatBonusPct = 3;      // +% de stats par niveau
         public int PromotionWatts = 60;
         public int DailyLoginWatts = 10;
+        public double StartingPrimes = 15;
+        public int StartingWatts = 30;
         public int StartingStarters = 4;          // coureurs Amateur donnés au départ (+ 1 Élite garanti)
         public double BotLevelBase = 40;          // niveau des équipes adverses en ligue Amateur
         public double BotLevelPerTier = 6;
@@ -183,6 +185,7 @@ namespace Echappee.Config
     public sealed class ShopTuning
     {
         public List<WattsPackConfig> WattsPacks = new List<WattsPackConfig>();
+        public List<WattsPackConfig> LimitedOffers = new List<WattsPackConfig>();   // offres limitées : 3 niveaux de valeur
         public double StarterPriceEur = 2.99;
         public int StarterWatts = 150;
         public double StarterBoostHours = 24;

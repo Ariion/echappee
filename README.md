@@ -2,22 +2,33 @@
 
 Jeu mobile hybrid-casual de gestion de cyclisme (nom de travail). Vision complète : [`docs/echappee-concept.html`](docs/echappee-concept.html). Règles pour le code : [`CLAUDE.md`](CLAUDE.md). Contraintes : **budget zéro**, tout est fait maison ([`docs/ZERO-COST.md`](docs/ZERO-COST.md)).
 
+## Jouer
+
+L'application est une **PWA** (site installable, fonctionne hors ligne) en Blazor WebAssembly : même code C# testé que le reste du projet.
+
+```bash
+dotnet publish src/Echappee.Web -c Release -o /tmp/site
+cd /tmp/site/wwwroot && python3 -m http.server 8099      # puis ouvrir http://localhost:8099
+```
+
+Publication gratuite : le workflow `.github/workflows/pages.yml` publie sur GitHub Pages à chaque fusion dans `main` (réglage unique à faire dans GitHub : *Settings → Pages → Source : GitHub Actions*). Sur téléphone : ouvrir l'adresse, puis « Ajouter à l'écran d'accueil ».
+
 ## État d'avancement
 
 | Étape (CLAUDE.md) | État |
 |---|---|
-| 1. Projet avec contrôle de version | Fait pour le code. Le projet Unity se crée sur ta machine (voir [`unity/README.md`](unity/README.md)). |
-| 2. Simulation de course + affichage minimal | **Fait** : simulation déterministe testée, aperçu jouable dans le navigateur. |
-| 3. Économie et grands nombres | **Fait** : `BigAmount`, revenu/s, hors ligne plafonné, boost vidéo, primes de course. |
-| 4. Écrans (Course, Équipe, Boutique) | À faire dans Unity. Les textes des 6 langues (FR, EN, ES, PT, IT, DE) sont prêts dans `data/strings/` ; les traductions non françaises sont à faire relire par des natifs. |
-| 5. Cartes, packs avec garantie, ligues | **Logique faite et testée** (packs, fragments, niveaux, ligue de 8 équipes). Écrans à faire. |
-| 6. Plan de course, Maillot Studio, affiche | **Fait côté logique** : Plan de course (règles, analyseur avant/après), maillots (6 motifs, couleurs sécurisées) et affiche de victoire SVG. Écrans Unity à faire. |
-| 7. Pubs, achats, consentement, analytics | **Règles faites et testées** (`AdPolicy`, `OfferPolicy`, seuils de rétention, noms d'événements). SDK AdMob / IAP / Firebase à brancher dans Unity. |
+| 1. Projet avec contrôle de version | **Fait** (solution .NET, CI, déploiement Pages). |
+| 2. Simulation de course + affichage minimal | **Fait** : simulation déterministe testée, course animée dans l'app. |
+| 3. Économie et grands nombres | **Fait** : revenu/s, hors ligne plafonné 4 h, boost, améliorations ×1/×10/MAX. |
+| 4. Écrans Course, Équipe, Boutique | **Faits**, plus Plan de course, Ligues, Disciplines, Maillot Studio, Réglages. |
+| 5. Cartes, packs avec garantie, ligues | **Fait** : packs (taux affichés, compteur de garantie), fragments, niveaux, ligue hebdomadaire. |
+| 6. Plan de course, Maillot Studio, affiche | **Fait** : règles SI/ALORS, simulation 100 courses, 6 motifs, affiche partageable. |
+| 7. Pubs, achats, consentement, analytics | **Règles faites et testées**. Dans l'app, vidéos et achats sont **simulés** (mode test). Vraie pub / vrais paiements : voir `docs/ZERO-COST.md`. |
 
 ## Commandes
 
 ```bash
-dotnet test                                                    # 71 tests, sans Unity
+dotnet test tests/Echappee.Core.Tests                          # 78 tests, sans navigateur, sans Unity
 dotnet run --project tools/Echappee.Cli -- race 42 route 55    # regarder le fil d'une course
 dotnet run --project tools/Echappee.Cli -- stats route 50      # mesurer l'équilibrage sur 300 courses
 dotnet run --project tools/Echappee.Cli -- plan route 58       # taux de victoire avant / après un Plan
@@ -35,5 +46,7 @@ Ouvre `docs/preview/course.html` dans un navigateur : c'est une vraie course sim
 - `data/*.json` : **toutes** les valeurs d'équilibrage (prix, taux, seuils), les circuits et les coureurs. En production, `balance.json` sera servi par Remote Config.
 - `tests/Echappee.Core.Tests` : tests unitaires (dont déterminisme, taux des packs, garanties, rythme de l'économie).
 - `tools/Echappee.Cli` : outil d'équilibrage et générateur d'aperçu.
-- `unity/` : scripts Unity (non testés dans l'éditeur, voir son README).
+- `src/Echappee.Web` : l'application jouable (Blazor WebAssembly).
+- `tests/e2e` : parcours complet dans un vrai navigateur.
+- `unity/` : scripts Unity optionnels (non testés), gardés pour une éventuelle sortie sur les magasins.
 - `docs/` : concept, décisions, plan à zéro euro, points légaux.
