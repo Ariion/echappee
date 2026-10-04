@@ -170,5 +170,9 @@
  "daily.title": "Daily bonus",
  "video.title": "Bonus video",
  "video.sim": "Simulated ad (no real ad). Please wait…",
- "plan.recommended": "Use the recommended plan"
+ "plan.recommended": "Use the recommended plan",
+ "seg.Climb": "Climb",
+ "seg.Descent": "Descent",
+ "seg.Technical": "Technical",
+ "seg.Sprint": "Sprint"
 }

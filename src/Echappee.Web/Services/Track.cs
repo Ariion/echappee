@@ -54,6 +54,14 @@ public static class Track
         return (x - dy / n * lane, y + dx / n * lane);
     }
 
+    /// <summary>Le circuit échantillonné à pas égal, à plat : x0,y0,x1,y1... (pour le dessin du canvas).</summary>
+    public static double[] Samples(int n)
+    {
+        var r = new double[n * 2];
+        for (int i = 0; i < n; i++) { var (x, y) = At(i / (double)n); r[2 * i] = Math.Round(x, 2); r[2 * i + 1] = Math.Round(y, 2); }
+        return r;
+    }
+
     /// <summary>Points d'une portion du circuit (pour colorer les segments).</summary>
     public static string Polyline(double fromFrac, double toFrac)
     {

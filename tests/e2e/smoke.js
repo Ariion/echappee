@@ -21,9 +21,17 @@ const exe = process.env.CHROMIUM_PATH || undefined;
   await page.click('.infra .card >> nth=0 >> button');                  // première amélioration (capital de départ)
   await must(await page.locator('.infra .card >> nth=0 >> .lv').innerText().then(t => /1/.test(t)), 'niveau 1 après achat');
 
+  await page.evaluate(() => ech.race.startTrace());
   await page.click('text=Lancer la course');
+  await page.waitForTimeout(8000);                                       // on laisse tourner l'animation avant de passer
   await page.click('text=Passer');
   await page.waitForSelector('.result', { timeout: 30000 });
+  // animation : 60 coureurs (12 équipes de 5), aucun ne recule d'une image à l'autre
+  const trail = await page.evaluate(() => ech.race.trace());
+  await must(trail.length > 100 && trail[0].length === 60, '60 coureurs animés');
+  let back = 0;
+  for (let i = 1; i < trail.length; i++) for (let j = 0; j < trail[i].length; j++) if (trail[i][j] - trail[i - 1][j] < -0.0005) back++;
+  await must(back === 0, 'aucun coureur ne recule (' + back + ' reculs)');
   await must((await page.locator('.rank').innerText()).includes('/ 12'), 'classement affiché');
 
   for (const label of ['Équipe', 'Plan de course', 'Ligues', 'Boutique']) {

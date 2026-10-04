@@ -170,5 +170,9 @@
  "daily.title": "Bonus du jour",
  "video.title": "Vidéo de bonus",
  "video.sim": "Publicité simulée (aucune vraie pub). Patiente…",
- "plan.recommended": "Utiliser le plan conseillé"
+ "plan.recommended": "Utiliser le plan conseillé",
+ "seg.Climb": "Côte",
+ "seg.Descent": "Descente",
+ "seg.Technical": "Technique",
+ "seg.Sprint": "Sprint"
 }

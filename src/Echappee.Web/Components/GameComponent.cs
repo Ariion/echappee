@@ -11,7 +11,7 @@ public abstract class GameComponent : ComponentBase, IDisposable
 
     protected override void OnInitialized() => G.Changed += OnChanged;
     void OnChanged() => InvokeAsync(StateHasChanged);
-    public void Dispose() => G.Changed -= OnChanged;
+    public virtual void Dispose() => G.Changed -= OnChanged;
 
     protected string T(string key, params object[] a) => G.T(key, a);
     protected string Money(double eur) => eur.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture).Replace(".", G.Dec) + " €";

@@ -7,7 +7,7 @@
     "BaseSpeedMps": 16.7,
     "StatSpeedSpan": 0.4,
     "MinWeightFactor": 0.4,
-    "NoiseSpeed": 0.03,
+    "NoiseSpeed": 0.04,
     "DraftRangeM": 9,
     "DraftSpeedBonus": 0.035,
     "DraftFatigueFactor": 0.65,
@@ -34,7 +34,7 @@
       "GroupChaseFatigue": 1.15,
       "TotalKmDisplay": 120
     },
-    "FormSpread": 0.02,
+    "FormSpread": 0.035,
     "PlayerAutoAttack": false
   },
   "Disciplines": {

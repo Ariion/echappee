@@ -1,4 +1,5 @@
 @inherits GameComponent
+@implements IAsyncDisposable
 
 <section class="screen">
     <div class="race-card">
@@ -19,20 +20,11 @@
                 <div class="r">@G.Race.Field[lead].Name<b>&nbsp;</b></div>
             </div>
         }
-        <svg viewBox="0 0 200 150" class="track" role="img" aria-label="@T("ui.race")">
-            <path d="@Track.PathD" fill="none" stroke="#2C3563" stroke-width="13" stroke-linejoin="round"/>
-            @foreach (var (pts, color) in SegmentLines())
-            {
-                <polyline points="@pts" fill="none" stroke="@color" stroke-width="2.6" stroke-linecap="round" opacity=".9"/>
-            }
-            <path d="@Track.PathD" fill="none" stroke="#EEF2F8" stroke-width="1" stroke-dasharray="3 5" opacity=".35"/>
-            @{ var f = Track.At(0, 0); }
-            <circle cx="@F(f.x)" cy="@F(f.y)" r="2" fill="#EEF2F8"/>
-            @foreach (var d in Dots())
-            {
-                <circle cx="@F(d.x)" cy="@F(d.y)" r="@(d.me ? "4.6" : "3.3")" fill="@d.color" stroke="@(d.me ? "#fff" : "#EEF2F8")" stroke-width="@(d.me ? "1.6" : ".8")"/>
-            }
-        </svg>
+        <div class="scene"><canvas @ref="canvas" class="track" aria-label="@T("ui.race")"></canvas></div>
+        <ul class="legend" aria-hidden="true">
+            <li><i style="background:#FF4F8B"></i>@T("seg.Climb")</li><li><i style="background:#1FCB8E"></i>@T("seg.Descent")</li>
+            <li><i style="background:#FFC933"></i>@T("seg.Technical")</li><li><i style="background:#3C5BFF"></i>@T("seg.Sprint")</li>
+        </ul>
         <div class="ticker">
             @if (G.Race == null) { <div>@T("msg.readyToRace")</div> }
             else
@@ -96,7 +88,15 @@
 @code {
     [Parameter] public EventCallback<string> OnNavigate { get; set; }
     int mult = 1;
-    static readonly string[] Colors = { "#1FCB8E", "#3C5BFF", "#FF4F8B", "#FFC933", "#FF8A3D", "#8A5CF6", "#22D3EE", "#F5F7FF", "#A3E635", "#FB7185", "#94A3B8", "#E879F9" };
+    ElementReference canvas;
+    bool attached;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!attached) { attached = true; await G.AttachRaceViewAsync(canvas); }
+    }
+
+    public async ValueTask DisposeAsync() { Dispose(); await G.DetachRaceViewAsync(); }
 
     static string F(double v) => v.ToString("0.#", System.Globalization.CultureInfo.InvariantCulture);
 
@@ -139,44 +139,6 @@
     {
         double left = Math.Max(0, G.Race.Disc.DurationSeconds - G.Race.Elapsed);
         return "00:" + ((int)Math.Ceiling(left)).ToString("00");
-    }
-
-    IEnumerable<(double x, double y, string color, bool me)> Dots()
-    {
-        if (G.Race == null)
-        {
-            for (int i = 0; i < 12; i++)
-            {
-                var (x, y) = Track.At(0.0 - i * 0.004, ((i % 4) - 1.5) * 2.4);
-                yield return (x, y, Colors[i], i == 0);
-            }
-            yield break;
-        }
-        var p = Positions();
-        var (_, _, order) = Standing();
-        float lead = p[order[0]];
-        for (int i = 0; i < p.Length; i++)
-        {
-            int rk = Array.IndexOf(order, i);
-            double vis = Math.Max(0, lead - (lead - p[i]) * 4);
-            var (x, y) = Track.At(vis * 0.98, ((rk % 4) - 1.5) * 2.4);
-            yield return (x, y, Colors[i % Colors.Length], i == 0);
-        }
-    }
-
-    IEnumerable<(string, string)> SegmentLines()
-    {
-        var key = G.Race?.DiscKey ?? G.S.SelectedDiscipline;
-        if (!G.Data.Balance.Disciplines.ContainsKey(key)) yield break;
-        var course = G.Data.Courses[G.Data.Balance.Disciplines[key].Circuit];
-        double acc = 0;
-        foreach (var s in course.Segments)
-        {
-            double a = acc / 100.0 * 0.98, b = (acc + s.LengthPct) / 100.0 * 0.98;
-            acc += s.LengthPct;
-            string c = s.Type switch { SegmentType.Climb => "#FF4F8B", SegmentType.Descent => "#1FCB8E", SegmentType.Technical => "#FFC933", SegmentType.Sprint => "#3C5BFF", _ => null };
-            if (c != null) yield return (Track.Polyline(a, b), c);
-        }
     }
 
     IEnumerable<string> Ticker()
