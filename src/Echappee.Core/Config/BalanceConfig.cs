@@ -34,6 +34,8 @@ namespace Echappee.Config
         public double StatSpeedSpan = 0.18;      // écart de vitesse entre une équipe 0 et une équipe 100
         public double MinWeightFactor = 0.4;     // poids de discipline 0 => facteur 0.4 ; 3 => 1.0
         public double NoiseSpeed = 0.012;
+        public bool PlayerAutoAttack = false;    // sans règle qui s'applique, l'équipe du joueur reste dans le peloton
+        public double FormSpread = 0.02;         // forme du jour, constante sur toute la course
         public double DraftRangeM = 9;
         public double DraftSpeedBonus = 0.035;
         public double DraftFatigueFactor = 0.65;

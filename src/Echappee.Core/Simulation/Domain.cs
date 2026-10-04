@@ -123,6 +123,7 @@ namespace Echappee.Simulation
         public int Rank;
         public double FinishTime;     // double.PositiveInfinity si pas arrivé
         public double Distance;
+        public double Fatigue;        // 0..1 à l'arrivée
     }
 
     public sealed class Snapshot

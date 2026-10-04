@@ -83,6 +83,7 @@ namespace Echappee.Simulation
             public string[] BestName = new string[SegTypes.Length];
             public double BestClimb, BestSprint;
             public int LastRule = -1;
+            public double Form;
         }
 
         TeamState Prepare(Team team, DisciplineConfig d)
@@ -125,7 +126,7 @@ namespace Echappee.Simulation
             double[] starts = ScaledStarts(course, meters);
             int n = teams.Count;
             var ts = new TeamState[n];
-            for (int i = 0; i < n; i++) ts[i] = Prepare(teams[i], discipline);
+            for (int i = 0; i < n; i++) { ts[i] = Prepare(teams[i], discipline); ts[i].Form = _t.FormSpread * rng.Gauss(); }
 
             var res = new RaceResult { Seed = seed };
             double dt = _t.TickSeconds, t = 0, maxT = discipline.DurationSeconds * _t.MaxTimeFactor;
@@ -200,7 +201,7 @@ namespace Echappee.Simulation
 
                     // base
                     double speed = _t.BaseSpeedMps * TypeSpeedFactor(seg.Type) *
-                        (1 + _t.StatSpeedSpan * (s.Strength[si] - 50) / 100.0 + s.Noise);
+                        (1 + _t.StatSpeedSpan * (s.Strength[si] - 50) / 100.0 + s.Noise + s.Form);
                     double fat = _t.FatigueBase * (seg.Type == SegmentType.Climb ? 1.3 : 1.0);
                     if (seg.Type == SegmentType.Descent) fat = -_t.FatigueRecoveryDescent;
                     double speedBonus = 0, fatMul = 1;
@@ -236,7 +237,7 @@ namespace Echappee.Simulation
                     }
 
                     // attaques (IA, et joueur quand aucune règle ne s'applique)
-                    if (ruleApplied < 0 && t >= s.AttackUntil && s.Fatigue < 0.5 && s.Pos > 0.03 * meters)
+                    if (ruleApplied < 0 && (!s.Team.IsPlayer || _t.PlayerAutoAttack) && t >= s.AttackUntil && s.Fatigue < 0.5 && s.Pos > 0.03 * meters)
                     {
                         double p = _t.AttackChancePerSecond * dt * AttackAppeal(seg.Type) * (s.Strength[si] / 50.0);
                         if (rng.Chance(p))
@@ -299,7 +300,7 @@ namespace Echappee.Simulation
             for (int k = 0; k < idx.Count; k++)
             {
                 int i = idx[k];
-                res.Standings.Add(new Standing { TeamIndex = i, TeamId = ts[i].Team.Id, Rank = k + 1, FinishTime = ts[i].FinishTime, Distance = ts[i].Pos });
+                res.Standings.Add(new Standing { TeamIndex = i, TeamId = ts[i].Team.Id, Rank = k + 1, FinishTime = ts[i].FinishTime, Distance = ts[i].Pos, Fatigue = ts[i].Fatigue });
                 if (ts[i].Team.IsPlayer) res.PlayerRank = k + 1;
             }
             return res;
