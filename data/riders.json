@@ -1,0 +1,542 @@
+[
+ {
+  "Id": "r001",
+  "Name": "A. Ferreira",
+  "Rarity": "Amateur",
+  "Sprint": 35,
+  "Climb": 31,
+  "Rouleur": 58,
+  "Technique": 29
+ },
+ {
+  "Id": "r002",
+  "Name": "N. Haas",
+  "Rarity": "Amateur",
+  "Sprint": 27,
+  "Climb": 35,
+  "Rouleur": 42,
+  "Technique": 53
+ },
+ {
+  "Id": "r003",
+  "Name": "M. Castellano",
+  "Rarity": "Amateur",
+  "Sprint": 28,
+  "Climb": 53,
+  "Rouleur": 35,
+  "Technique": 31
+ },
+ {
+  "Id": "r004",
+  "Name": "J. Keller",
+  "Rarity": "Amateur",
+  "Sprint": 54,
+  "Climb": 36,
+  "Rouleur": 36,
+  "Technique": 30
+ },
+ {
+  "Id": "r005",
+  "Name": "I. Ferreira",
+  "Rarity": "Amateur",
+  "Sprint": 31,
+  "Climb": 54,
+  "Rouleur": 35,
+  "Technique": 45
+ },
+ {
+  "Id": "r006",
+  "Name": "L. Marchand",
+  "Rarity": "Amateur",
+  "Sprint": 42,
+  "Climb": 33,
+  "Rouleur": 52,
+  "Technique": 23
+ },
+ {
+  "Id": "r007",
+  "Name": "R. Costa",
+  "Rarity": "Amateur",
+  "Sprint": 27,
+  "Climb": 56,
+  "Rouleur": 40,
+  "Technique": 48
+ },
+ {
+  "Id": "r008",
+  "Name": "L. Meyer",
+  "Rarity": "Amateur",
+  "Sprint": 54,
+  "Climb": 27,
+  "Rouleur": 34,
+  "Technique": 43
+ },
+ {
+  "Id": "r009",
+  "Name": "M. Bernard",
+  "Rarity": "Amateur",
+  "Sprint": 48,
+  "Climb": 47,
+  "Rouleur": 53,
+  "Technique": 23
+ },
+ {
+  "Id": "r010",
+  "Name": "M. Gomez",
+  "Rarity": "Amateur",
+  "Sprint": 39,
+  "Climb": 45,
+  "Rouleur": 58,
+  "Technique": 39
+ },
+ {
+  "Id": "r011",
+  "Name": "P. Mercier",
+  "Rarity": "Amateur",
+  "Sprint": 37,
+  "Climb": 38,
+  "Rouleur": 40,
+  "Technique": 54
+ },
+ {
+  "Id": "r012",
+  "Name": "N. Giraud",
+  "Rarity": "Amateur",
+  "Sprint": 41,
+  "Climb": 56,
+  "Rouleur": 36,
+  "Technique": 24
+ },
+ {
+  "Id": "r013",
+  "Name": "M. Meyer",
+  "Rarity": "Amateur",
+  "Sprint": 37,
+  "Climb": 48,
+  "Rouleur": 56,
+  "Technique": 46
+ },
+ {
+  "Id": "r014",
+  "Name": "L. Vermeer",
+  "Rarity": "Amateur",
+  "Sprint": 41,
+  "Climb": 57,
+  "Rouleur": 45,
+  "Technique": 33
+ },
+ {
+  "Id": "r015",
+  "Name": "R. Schmid",
+  "Rarity": "Amateur",
+  "Sprint": 33,
+  "Climb": 34,
+  "Rouleur": 57,
+  "Technique": 43
+ },
+ {
+  "Id": "r016",
+  "Name": "Y. Laurent",
+  "Rarity": "Amateur",
+  "Sprint": 44,
+  "Climb": 55,
+  "Rouleur": 44,
+  "Technique": 38
+ },
+ {
+  "Id": "r017",
+  "Name": "Z. Gomez",
+  "Rarity": "Amateur",
+  "Sprint": 29,
+  "Climb": 53,
+  "Rouleur": 43,
+  "Technique": 36
+ },
+ {
+  "Id": "r018",
+  "Name": "E. Castellano",
+  "Rarity": "Amateur",
+  "Sprint": 46,
+  "Climb": 53,
+  "Rouleur": 40,
+  "Technique": 44
+ },
+ {
+  "Id": "r019",
+  "Name": "A. Bianchi",
+  "Rarity": "Amateur",
+  "Sprint": 53,
+  "Climb": 44,
+  "Rouleur": 24,
+  "Technique": 34
+ },
+ {
+  "Id": "r020",
+  "Name": "M. Marchand",
+  "Rarity": "Amateur",
+  "Sprint": 38,
+  "Climb": 27,
+  "Rouleur": 46,
+  "Technique": 54
+ },
+ {
+  "Id": "r021",
+  "Name": "Y. Rossi",
+  "Rarity": "Amateur",
+  "Sprint": 58,
+  "Climb": 23,
+  "Rouleur": 33,
+  "Technique": 45
+ },
+ {
+  "Id": "r022",
+  "Name": "T. Gomez",
+  "Rarity": "Amateur",
+  "Sprint": 42,
+  "Climb": 55,
+  "Rouleur": 28,
+  "Technique": 26
+ },
+ {
+  "Id": "r023",
+  "Name": "I. Castellano",
+  "Rarity": "Amateur",
+  "Sprint": 45,
+  "Climb": 32,
+  "Rouleur": 47,
+  "Technique": 54
+ },
+ {
+  "Id": "r024",
+  "Name": "R. Schmid",
+  "Rarity": "Amateur",
+  "Sprint": 42,
+  "Climb": 47,
+  "Rouleur": 54,
+  "Technique": 30
+ },
+ {
+  "Id": "r025",
+  "Name": "T. Pereira",
+  "Rarity": "Pro",
+  "Sprint": 54,
+  "Climb": 52,
+  "Rouleur": 50,
+  "Technique": 64
+ },
+ {
+  "Id": "r026",
+  "Name": "I. Vidal",
+  "Rarity": "Pro",
+  "Sprint": 69,
+  "Climb": 40,
+  "Rouleur": 46,
+  "Technique": 60
+ },
+ {
+  "Id": "r027",
+  "Name": "R. Weber",
+  "Rarity": "Pro",
+  "Sprint": 45,
+  "Climb": 66,
+  "Rouleur": 58,
+  "Technique": 44
+ },
+ {
+  "Id": "r028",
+  "Name": "H. Lindqvist",
+  "Rarity": "Pro",
+  "Sprint": 40,
+  "Climb": 52,
+  "Rouleur": 67,
+  "Technique": 48
+ },
+ {
+  "Id": "r029",
+  "Name": "A. Brandao",
+  "Rarity": "Pro",
+  "Sprint": 42,
+  "Climb": 70,
+  "Rouleur": 51,
+  "Technique": 50
+ },
+ {
+  "Id": "r030",
+  "Name": "M. Bernard",
+  "Rarity": "Pro",
+  "Sprint": 50,
+  "Climb": 55,
+  "Rouleur": 66,
+  "Technique": 59
+ },
+ {
+  "Id": "r031",
+  "Name": "L. Duarte",
+  "Rarity": "Pro",
+  "Sprint": 54,
+  "Climb": 65,
+  "Rouleur": 55,
+  "Technique": 48
+ },
+ {
+  "Id": "r032",
+  "Name": "J. Dubois",
+  "Rarity": "Pro",
+  "Sprint": 67,
+  "Climb": 53,
+  "Rouleur": 47,
+  "Technique": 51
+ },
+ {
+  "Id": "r033",
+  "Name": "S. Varenne",
+  "Rarity": "Pro",
+  "Sprint": 49,
+  "Climb": 40,
+  "Rouleur": 60,
+  "Technique": 69
+ },
+ {
+  "Id": "r034",
+  "Name": "C. Silva",
+  "Rarity": "Pro",
+  "Sprint": 42,
+  "Climb": 60,
+  "Rouleur": 65,
+  "Technique": 45
+ },
+ {
+  "Id": "r035",
+  "Name": "R. Pons",
+  "Rarity": "Pro",
+  "Sprint": 44,
+  "Climb": 64,
+  "Rouleur": 59,
+  "Technique": 40
+ },
+ {
+  "Id": "r036",
+  "Name": "A. Ricci",
+  "Rarity": "Pro",
+  "Sprint": 68,
+  "Climb": 42,
+  "Rouleur": 59,
+  "Technique": 44
+ },
+ {
+  "Id": "r037",
+  "Name": "H. Fabre",
+  "Rarity": "Pro",
+  "Sprint": 49,
+  "Climb": 56,
+  "Rouleur": 50,
+  "Technique": 65
+ },
+ {
+  "Id": "r038",
+  "Name": "E. Marchand",
+  "Rarity": "Pro",
+  "Sprint": 46,
+  "Climb": 66,
+  "Rouleur": 48,
+  "Technique": 56
+ },
+ {
+  "Id": "r039",
+  "Name": "L. Colin",
+  "Rarity": "Pro",
+  "Sprint": 53,
+  "Climb": 68,
+  "Rouleur": 56,
+  "Technique": 50
+ },
+ {
+  "Id": "r040",
+  "Name": "H. Marchand",
+  "Rarity": "Pro",
+  "Sprint": 68,
+  "Climb": 43,
+  "Rouleur": 53,
+  "Technique": 47
+ },
+ {
+  "Id": "r041",
+  "Name": "N. Pons",
+  "Rarity": "Pro",
+  "Sprint": 66,
+  "Climb": 53,
+  "Rouleur": 54,
+  "Technique": 59
+ },
+ {
+  "Id": "r042",
+  "Name": "R. Ferreira",
+  "Rarity": "Pro",
+  "Sprint": 49,
+  "Climb": 57,
+  "Rouleur": 68,
+  "Technique": 40
+ },
+ {
+  "Id": "r043",
+  "Name": "E. Fabre",
+  "Rarity": "Pro",
+  "Sprint": 70,
+  "Climb": 48,
+  "Rouleur": 58,
+  "Technique": 45
+ },
+ {
+  "Id": "r044",
+  "Name": "S. Lopes",
+  "Rarity": "Pro",
+  "Sprint": 51,
+  "Climb": 54,
+  "Rouleur": 44,
+  "Technique": 69
+ },
+ {
+  "Id": "r045",
+  "Name": "P. Moreau",
+  "Rarity": "Elite",
+  "Sprint": 78,
+  "Climb": 61,
+  "Rouleur": 54,
+  "Technique": 69
+ },
+ {
+  "Id": "r046",
+  "Name": "L. Moreau",
+  "Rarity": "Elite",
+  "Sprint": 59,
+  "Climb": 62,
+  "Rouleur": 79,
+  "Technique": 58
+ },
+ {
+  "Id": "r047",
+  "Name": "C. Gomez",
+  "Rarity": "Elite",
+  "Sprint": 72,
+  "Climb": 81,
+  "Rouleur": 61,
+  "Technique": 70
+ },
+ {
+  "Id": "r048",
+  "Name": "N. Fabre",
+  "Rarity": "Elite",
+  "Sprint": 81,
+  "Climb": 72,
+  "Rouleur": 63,
+  "Technique": 61
+ },
+ {
+  "Id": "r049",
+  "Name": "R. Ortega",
+  "Rarity": "Elite",
+  "Sprint": 62,
+  "Climb": 78,
+  "Rouleur": 59,
+  "Technique": 54
+ },
+ {
+  "Id": "r050",
+  "Name": "S. Laurent",
+  "Rarity": "Elite",
+  "Sprint": 55,
+  "Climb": 58,
+  "Rouleur": 70,
+  "Technique": 81
+ },
+ {
+  "Id": "r051",
+  "Name": "M. Navarro",
+  "Rarity": "Elite",
+  "Sprint": 72,
+  "Climb": 68,
+  "Rouleur": 62,
+  "Technique": 80
+ },
+ {
+  "Id": "r052",
+  "Name": "T. Lindqvist",
+  "Rarity": "Elite",
+  "Sprint": 76,
+  "Climb": 64,
+  "Rouleur": 56,
+  "Technique": 69
+ },
+ {
+  "Id": "r053",
+  "Name": "I. Pons",
+  "Rarity": "Elite",
+  "Sprint": 69,
+  "Climb": 72,
+  "Rouleur": 71,
+  "Technique": 81
+ },
+ {
+  "Id": "r054",
+  "Name": "N. Colin",
+  "Rarity": "Elite",
+  "Sprint": 66,
+  "Climb": 59,
+  "Rouleur": 82,
+  "Technique": 72
+ },
+ {
+  "Id": "r055",
+  "Name": "E. Fabre",
+  "Rarity": "Elite",
+  "Sprint": 77,
+  "Climb": 56,
+  "Rouleur": 57,
+  "Technique": 54
+ },
+ {
+  "Id": "r056",
+  "Name": "P. Vidal",
+  "Rarity": "Elite",
+  "Sprint": 61,
+  "Climb": 79,
+  "Rouleur": 66,
+  "Technique": 60
+ },
+ {
+  "Id": "r057",
+  "Name": "D. Navarro",
+  "Rarity": "Legende",
+  "Sprint": 72,
+  "Climb": 77,
+  "Rouleur": 94,
+  "Technique": 70
+ },
+ {
+  "Id": "r058",
+  "Name": "Z. Weber",
+  "Rarity": "Legende",
+  "Sprint": 73,
+  "Climb": 69,
+  "Rouleur": 92,
+  "Technique": 73
+ },
+ {
+  "Id": "r059",
+  "Name": "Z. Navarro",
+  "Rarity": "Legende",
+  "Sprint": 75,
+  "Climb": 72,
+  "Rouleur": 77,
+  "Technique": 91
+ },
+ {
+  "Id": "r060",
+  "Name": "A. Okafor",
+  "Rarity": "Legende",
+  "Sprint": 80,
+  "Climb": 76,
+  "Rouleur": 75,
+  "Technique": 92
+ }
+]

@@ -1,0 +1,66 @@
+{
+  "Race": {
+    "Teams": 12, "StartersPerTeam": 5, "TickSeconds": 0.1, "CourseMeters": 1000, "BaseSpeedMps": 16.7,
+    "StatSpeedSpan": 0.18, "MinWeightFactor": 0.4, "NoiseSpeed": 0.012,
+    "DraftRangeM": 9, "DraftSpeedBonus": 0.035, "DraftFatigueFactor": 0.65,
+    "FatigueBase": 0.009, "FatigueRecoveryDescent": 0.004, "ExhaustionStart": 0.65, "ExhaustionSlowdown": 0.30,
+    "AttackChancePerSecond": 0.05, "AttackDurationS": 6, "AttackSpeedBonus": 0.07, "AttackFatigueFactor": 2.0,
+    "SplitGapM": 14, "BreakawayGapM": 30, "SnapshotEverySeconds": 0.5, "MaxTimeFactor": 1.6,
+    "Plan": {
+      "ClimberAttackSpeed": 0.09, "ClimberAttackFatigue": 2.0,
+      "StayInWheelSpeed": -0.02, "StayInWheelFatigue": 0.5,
+      "SprintLaunchSpeed": 0.10, "SprintLaunchFatigue": 2.5,
+      "GroupChaseSpeed": 0.05, "GroupChaseFatigue": 1.3,
+      "TotalKmDisplay": 120
+    }
+  },
+  "Disciplines": {
+    "route":      { "Name": "Route",       "Sprint": 2, "Climb": 3, "Rouleur": 3, "Technique": 1, "DurationSeconds": 60, "UnlockLeague": null,          "Circuit": "route" },
+    "piste":      { "Name": "Piste",       "Sprint": 3, "Climb": 0, "Rouleur": 2, "Technique": 1, "DurationSeconds": 30, "UnlockLeague": null,          "Circuit": "piste" },
+    "bmx":        { "Name": "BMX",         "Sprint": 3, "Climb": 1, "Rouleur": 1, "Technique": 3, "DurationSeconds": 20, "UnlockLeague": "Regionale",   "Circuit": "bmx" },
+    "vtt":        { "Name": "VTT",         "Sprint": 1, "Climb": 3, "Rouleur": 2, "Technique": 3, "DurationSeconds": 60, "UnlockLeague": "Nationale",   "Circuit": "vtt" },
+    "cyclocross": { "Name": "Cyclo-cross", "Sprint": 2, "Climb": 2, "Rouleur": 2, "Technique": 3, "DurationSeconds": 45, "UnlockLeague": "Continentale","Circuit": "cyclocross" },
+    "gravel":     { "Name": "Gravel",      "Sprint": 1, "Climb": 2, "Rouleur": 3, "Technique": 2, "DurationSeconds": 90, "UnlockLeague": "WorldTour",   "Circuit": "gravel" }
+  },
+  "Infrastructures": [
+    { "Id": "sponsors",  "Name": "Sponsors",        "BaseCost": 15,    "CostGrowth": 1.15, "BaseIncome": 1.0,   "MilestoneLevels": [10, 25, 50, 100] },
+    { "Id": "bus",       "Name": "Bus d'équipe",    "BaseCost": 120,   "CostGrowth": 1.16, "BaseIncome": 8.0,   "MilestoneLevels": [10, 25, 50, 100] },
+    { "Id": "atelier",   "Name": "Atelier mécano",  "BaseCost": 1300,  "CostGrowth": 1.17, "BaseIncome": 70,    "MilestoneLevels": [10, 25, 50, 100] },
+    { "Id": "fanzone",   "Name": "Fan zone",        "BaseCost": 14000, "CostGrowth": 1.18, "BaseIncome": 600,   "MilestoneLevels": [10, 25, 50, 100] },
+    { "Id": "recup",     "Name": "Centre de récupération", "BaseCost": 160000, "CostGrowth": 1.19, "BaseIncome": 5200, "MilestoneLevels": [10, 25, 50, 100] }
+  ],
+  "Economy": {
+    "OfflineCapHours": 4, "OfflineVideoMultiplier": 3, "BoostVideoMultiplier": 2, "BoostVideoHours": 4,
+    "FreePacksPerDay": 3, "VideoWattsPerDay": 20, "RaceRewardSeconds": 60,
+    "PlaceRewardFactor": [3.0, 2.2, 1.7, 1.3, 1.1, 1.0, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3],
+    "LeaguePointsByPlace": [12, 9, 7, 5, 4, 3, 2, 2, 1, 1, 0, 0],
+    "CardChanceByPlace": [0.30, 0.20, 0.12, 0.06, 0.03, 0.02, 0.01, 0, 0, 0, 0, 0],
+    "RiderLevelCap": 10, "LevelStatBonusPct": 3
+  },
+  "Rarities": {
+    "Amateur": { "Order": 0, "DuplicateFragments": 5,   "FragmentsToLevel": [10, 20, 40, 80, 160, 320, 640, 1280, 2560] },
+    "Pro":     { "Order": 1, "DuplicateFragments": 20,  "FragmentsToLevel": [20, 40, 80, 160, 320, 640, 1280, 2560, 5120] },
+    "Elite":   { "Order": 2, "DuplicateFragments": 80,  "FragmentsToLevel": [40, 80, 160, 320, 640, 1280, 2560, 5120, 10240] },
+    "Legende": { "Order": 3, "DuplicateFragments": 320, "FragmentsToLevel": [80, 160, 320, 640, 1280, 2560, 5120, 10240, 20480] }
+  },
+  "Packs": {
+    "pro":   { "Name": "Pack Pro",   "WattsCost": 15, "MultiPullCount": 10, "MultiPullCost": 135,
+               "Odds": { "Amateur": 58, "Pro": 33, "Elite": 8.5, "Legende": 0.5 }, "GuaranteeRarity": "Elite",   "GuaranteeWithin": 15 },
+    "elite": { "Name": "Pack Élite", "WattsCost": 45, "MultiPullCount": 10, "MultiPullCost": 405,
+               "Odds": { "Amateur": 0, "Pro": 66, "Elite": 29, "Legende": 5 },       "GuaranteeRarity": "Legende", "GuaranteeWithin": 25 }
+  },
+  "Leagues": {
+    "Tiers": ["Amateur", "Regionale", "Nationale", "Continentale", "WorldTour", "Legende"],
+    "TeamsPerLeague": 8, "Promoted": 3, "Relegated": 2, "SeasonDays": 7, "GhostPowerSpread": 0.25
+  },
+  "Ads": { "NoAdsBeforeDay": 3, "InterstitialMinGapMinutes": 6, "NeverDuringRace": true },
+  "Offers": {
+    "StarterAfterSession": 2, "StarterDurationHours": 48, "SeasonPassFromDay": 3,
+    "NoAdsAfterRacesWithoutPurchase": 3, "LimitedOfferMinDays": 7, "StudioAfterFirstStageWins": 1
+  },
+  "Gates": {
+    "SoftLaunchD1": 0.35, "SoftLaunchD7": 0.15,
+    "TargetD1": 0.38, "TargetD7": 0.18, "TargetD30": 0.07,
+    "StopD7": 0.12
+  }
+}
