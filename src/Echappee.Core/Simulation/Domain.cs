@@ -112,6 +112,7 @@ namespace Echappee.Simulation
         public SegmentType Segment;
         public int Rule = -1;
         public int Value;
+        public ActionKind Action;     // pour PlanRule
 
         public override string ToString() => Time.ToString("0.0") + "s " + EventText.Fr(this);
     }
@@ -188,6 +189,49 @@ namespace Echappee.Simulation
                 case EventKind.SprintFinish: return "Sprint final lancé !";
                 case EventKind.Finish: return "Victoire de l'équipe " + who + " !";
                 default: return string.Empty;
+            }
+        }
+
+        /// <summary>Même fil d'événements, dans la langue du Localizer. Les clés viennent de data/strings/*.json.</summary>
+        public static string Format(RaceEvent e, Echappee.Config.Localizer loc)
+        {
+            string who = e.Rider ?? "?";
+            switch (e.Kind)
+            {
+                case EventKind.Start: return loc.Get("ev.start");
+                case EventKind.Attack: return loc.Get("ev.attack", who, loc.Get(WhereKey(e.Segment)));
+                case EventKind.PlanRule: return loc.Get("ev.planRule", e.Rule + 1, loc.Get(ActionKey(e.Action)));
+                case EventKind.Split: return loc.Get("ev.split");
+                case EventKind.Breakaway: return loc.Get("ev.breakaway", who, e.Value);
+                case EventKind.BreakawayCaught: return loc.Get("ev.caught");
+                case EventKind.Exhausted: return loc.Get("ev.exhausted", who);
+                case EventKind.LeadChange: return loc.Get("ev.leadChange", who);
+                case EventKind.SprintFinish: return loc.Get("ev.sprint");
+                case EventKind.Finish: return loc.Get("ev.finish", who);
+                default: return string.Empty;
+            }
+        }
+
+        public static string WhereKey(SegmentType t)
+        {
+            switch (t)
+            {
+                case SegmentType.Climb: return "where.climb";
+                case SegmentType.Descent: return "where.descent";
+                case SegmentType.Technical: return "where.technical";
+                case SegmentType.Sprint: return "where.sprint";
+                default: return "where.flat";
+            }
+        }
+
+        public static string ActionKey(ActionKind a)
+        {
+            switch (a)
+            {
+                case ActionKind.ClimberAttacks: return "act.climber";
+                case ActionKind.StayInWheel: return "act.wheel";
+                case ActionKind.SprinterLaunch: return "act.sprinter";
+                default: return "act.chase";
             }
         }
 

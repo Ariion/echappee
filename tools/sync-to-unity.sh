@@ -9,6 +9,7 @@ rm -rf "$core" "$data"
 mkdir -p "$core" "$data"
 ( cd "$root/src/Echappee.Core" && find . -name '*.cs' -not -path './obj/*' -not -path './bin/*' -print0 | xargs -0 -I{} cp --parents {} "$core" )
 cp "$root"/data/*.json "$data"/
+mkdir -p "$data/strings"; cp "$root"/data/strings/*.json "$data/strings"/
 cat > "$core/Echappee.Core.asmdef" <<'JSON'
 {
   "name": "Echappee.Core",

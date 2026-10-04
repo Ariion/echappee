@@ -4,6 +4,7 @@ using System.Linq;
 using Echappee.Config;
 using Echappee.Simulation;
 using Echappee.Economy;
+using Echappee.Studio;
 
 // Outil de développement : regarder une course et mesurer l'équilibrage sans Unity.
 //   dotnet run --project tools/Echappee.Cli -- race [seed] [discipline] [niveau]
@@ -136,6 +137,19 @@ switch (cmd)
         Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(outPath))!);
         File.WriteAllText(outPath, tpl.Substring(0, a) + json + tpl.Substring(b + 7));
         Console.WriteLine($"Aperçu écrit : {outPath} (place du joueur : {r.PlayerRank}/12, {r.Events.Count} événements)");
+        break;
+    }
+    case "poster":
+    {
+        // dotnet run --project tools/Echappee.Cli -- poster [langue] [sortie.svg]
+        var loc = new Localizer { Language = Arg(1, "fr") };
+        foreach (var l in Localizer.Languages) loc.Load(l, File.ReadAllText(Path.Combine(dir, l + ".json")));
+        string outPath = Arg(2, "docs/preview/affiche.svg");
+        var svg = PosterRenderer.Render(new PosterData { TeamName = "Cadence Mistral", DisciplineKey = "route", League = "Régionale", Stage = 12, TimeSeconds = 57.4,
+            Jersey = new JerseyDesign { Pattern = JerseyPattern.Chevrons, Sponsor = "Mistral" } }, loc);
+        Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(outPath))!);
+        File.WriteAllText(outPath, svg);
+        Console.WriteLine("Affiche écrite : " + outPath);
         break;
     }
     default:

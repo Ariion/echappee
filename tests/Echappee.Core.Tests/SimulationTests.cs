@@ -166,3 +166,60 @@ public class PlanBalanceTests
         Assert.Equal(Report(plan).AvgRankAfter, Report(plan).AvgRankAfter);
     }
 }
+
+public class LocalizationTests
+{
+    static Echappee.Config.Localizer Load()
+    {
+        var loc = new Echappee.Config.Localizer();
+        foreach (var l in Echappee.Config.Localizer.Languages)
+            loc.Load(l, System.IO.File.ReadAllText(System.IO.Path.Combine(System.AppContext.BaseDirectory, "data", l + ".json")));
+        return loc;
+    }
+
+    [Fact]
+    public void Every_language_has_every_key_with_the_same_placeholders()
+    {
+        var loc = Load();
+        var fr = loc.Keys("fr").ToList();
+        var ph = new System.Text.RegularExpressions.Regex(@"\{\d\}");
+        foreach (var l in Echappee.Config.Localizer.Languages)
+        {
+            Assert.Equal(fr.OrderBy(x => x), loc.Keys(l).OrderBy(x => x));
+            foreach (var k in fr)
+            {
+                Assert.False(string.IsNullOrWhiteSpace(loc.Raw(l, k)), l + ":" + k);
+                Assert.Equal(ph.Matches(loc.Raw("fr", k)).Select(m => m.Value).OrderBy(x => x),
+                             ph.Matches(loc.Raw(l, k)).Select(m => m.Value).OrderBy(x => x));
+            }
+        }
+    }
+
+    [Fact]
+    public void French_table_reproduces_the_built_in_event_text_and_other_languages_differ()
+    {
+        var loc = Load();
+        var d = TestData.Load();
+        var plan = new PlanDeCourse { Slots = 3 };
+        plan.Add(new PlanRule(ConditionKind.Gradient, Comparator.Greater, 6, ActionKind.ClimberAttacks));
+        var field = BotTeams.Field(d.Balance, TestData.Player(55, 7, plan), 50, 99);
+        var r = new RaceSimulator(d.Balance).Run(field, d.Courses["route"], d.Balance.Disciplines["route"], 8);
+        Assert.Contains(r.Events, e => e.Kind == EventKind.PlanRule);
+        foreach (var e in r.Events)
+        {
+            loc.Language = "fr";
+            Assert.Equal(EventText.Fr(e), EventText.Format(e, loc));
+            loc.Language = "en";
+            if (e.Kind == EventKind.Attack || e.Kind == EventKind.Start) Assert.NotEqual(EventText.Fr(e), EventText.Format(e, loc));
+        }
+    }
+
+    [Fact]
+    public void Unknown_language_falls_back_to_french_then_to_the_key()
+    {
+        var loc = Load();
+        loc.Language = "ja";
+        Assert.Equal("Course", loc.Get("ui.race"));
+        Assert.Equal("clé.inconnue", loc.Get("clé.inconnue"));
+    }
+}

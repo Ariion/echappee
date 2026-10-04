@@ -231,7 +231,7 @@ namespace Echappee.Simulation
                         {
                             ApplyAction(plan.Rules[ruleApplied].Action, s, breakNow && r >= groupAtBreak, ref speedBonus, ref fatMul);
                             if (ruleApplied != s.LastRule)
-                                res.Events.Add(new RaceEvent { Time = t, Kind = EventKind.PlanRule, Team = i, Rule = ruleApplied, Rider = ActionText(plan.Rules[ruleApplied].Action), Segment = seg.Type });
+                                res.Events.Add(new RaceEvent { Time = t, Kind = EventKind.PlanRule, Team = i, Rule = ruleApplied, Action = plan.Rules[ruleApplied].Action, Rider = ActionText(plan.Rules[ruleApplied].Action), Segment = seg.Type });
                         }
                         s.LastRule = ruleApplied;
                     }
