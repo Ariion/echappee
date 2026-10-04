@@ -19,6 +19,7 @@ namespace Echappee.Config
         public AdTuning Ads = new AdTuning();
         public OfferTuning Offers = new OfferTuning();
         public RetentionGates Gates = new RetentionGates();
+        public ComplianceTuning Compliance = new ComplianceTuning();
 
         public static BalanceConfig FromJson(string json) =>
             JsonConvert.DeserializeObject<BalanceConfig>(json);
@@ -155,5 +156,16 @@ namespace Echappee.Config
         public double SoftLaunchD1 = 0.35, SoftLaunchD7 = 0.15;
         public double TargetD1 = 0.38, TargetD7 = 0.18, TargetD30 = 0.07;
         public double StopD7 = 0.12;
+    }
+}
+
+namespace Echappee.Config
+{
+    /// <summary>Réglages légaux pilotables à distance sans nouvelle version de l'application.</summary>
+    public sealed class ComplianceTuning
+    {
+        /// <summary>Codes pays (ISO 3166-1 alpha-2) où l'ouverture de packs avec tirage payant est désactivée. À faire valider (voir docs/LEGAL.md).</summary>
+        public string[] PaidPackBlockedRegions = new string[0];
+        public int MinimumAge = 12;
     }
 }

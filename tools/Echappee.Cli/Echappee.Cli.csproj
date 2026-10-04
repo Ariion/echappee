@@ -6,5 +6,6 @@
   <ItemGroup>
     <ProjectReference Include="../../src/Echappee.Core/Echappee.Core.csproj" />
     <Content Include="../../data/*.json" Link="data/%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="preview.template.html" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

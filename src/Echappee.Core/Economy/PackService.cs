@@ -25,6 +25,13 @@ namespace Echappee.Economy
 
         static Rarity ParseRarity(string s) => (Rarity)Enum.Parse(typeof(Rarity), s);
 
+        /// <summary>Les packs ouverts avec des Watts achetés sont-ils autorisés dans ce pays ? (les packs gratuits restent toujours autorisés)</summary>
+        public bool IsPaidOpeningAllowed(string regionCode)
+        {
+            if (string.IsNullOrEmpty(regionCode)) return true;
+            return !_cfg.Compliance.PaidPackBlockedRegions.Any(r => string.Equals(r, regionCode, StringComparison.OrdinalIgnoreCase));
+        }
+
         public PackConfig Pack(string key) =>
             _cfg.Packs.TryGetValue(key, out var p) ? p : throw new ArgumentException("Pack inconnu : " + key);
 

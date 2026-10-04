@@ -346,5 +346,11 @@
     "TargetD7": 0.18,
     "TargetD30": 0.07,
     "StopD7": 0.12
+  },
+  "Compliance": {
+    "PaidPackBlockedRegions": [
+      "BE"
+    ],
+    "MinimumAge": 12
   }
 }

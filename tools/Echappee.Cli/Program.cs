@@ -106,6 +106,38 @@ switch (cmd)
         foreach (var kv in firsts) Console.WriteLine($"{kv.Key,-9} premier achat à {kv.Value / 60:0.0} min");
         break;
     }
+    case "preview":
+    {
+        // dotnet run --project tools/Echappee.Cli -- preview [seed] [discipline] [niveau] [sortie.html]
+        ulong seed = ulong.Parse(Arg(1, "1"));
+        var disc = cfg.Disciplines[Arg(2, "route")];
+        double lvl = double.Parse(Arg(3, "55"));
+        string outPath = Arg(4, "docs/preview/course.html");
+        var p = BotTeams.Create("player", "Cadence Mistral", lvl, new Rng(7), cfg.Race.StartersPerTeam); p.IsPlayer = true;
+        var plan = new PlanDeCourse { Slots = 5 };
+        plan.Add(new PlanRule(ConditionKind.KmRemaining, Comparator.Less, 12, ActionKind.SprinterLaunch));
+        plan.Add(new PlanRule(ConditionKind.Fatigue, Comparator.Greater, 65, ActionKind.StayInWheel));
+        plan.Add(new PlanRule(ConditionKind.Gradient, Comparator.Greater, 6, ActionKind.ClimberAttacks));
+        p.Plan = plan;
+        var field = BotTeams.Field(cfg, p, 50, 99);
+        var r = new RaceSimulator(cfg).Run(field, data.Courses[disc.Circuit], disc, seed, true);
+        var o = new
+        {
+            duration = Math.Round(Math.Min(r.Standings[0].FinishTime, r.Duration), 1),
+            snap = cfg.Race.SnapshotEverySeconds,
+            teams = field.Select(t => t.Name).ToArray(),
+            frames = r.Frames.Select(f => f.Positions.Select(v => Math.Round((double)v, 4)).ToArray()).ToArray(),
+            events = r.Events.Select(e => new { t = Math.Round(e.Time, 1), text = EventText.Fr(e) }).ToArray(),
+            standings = r.Standings.Select(s => field[s.TeamIndex].Name + " " + s.FinishTime.ToString("0.0", System.Globalization.CultureInfo.InvariantCulture) + " s").ToArray()
+        };
+        string json = Newtonsoft.Json.JsonConvert.SerializeObject(o);
+        string tpl = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "preview.template.html"));
+        int a = tpl.IndexOf("/*DATA*/"), b = tpl.IndexOf("/*END*/");
+        Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(outPath))!);
+        File.WriteAllText(outPath, tpl.Substring(0, a) + json + tpl.Substring(b + 7));
+        Console.WriteLine($"Aperçu écrit : {outPath} (place du joueur : {r.PlayerRank}/12, {r.Events.Count} événements)");
+        break;
+    }
     default:
         Console.WriteLine("Commandes : race | stats | plan");
         break;

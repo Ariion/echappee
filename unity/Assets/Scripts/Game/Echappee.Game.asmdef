@@ -1,0 +1,6 @@
+{
+  "name": "Echappee.Game",
+  "rootNamespace": "Echappee.Game",
+  "references": ["Echappee.Core", "Unity.Nuget.Newtonsoft-Json"],
+  "autoReferenced": true
+}

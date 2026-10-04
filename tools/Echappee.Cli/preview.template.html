@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Échappée – aperçu de course</title>
+<style>
+:root{--ink:#141A33;--chalk:#EEF2F8;--blue:#3C5BFF;--pink:#FF4F8B;--yellow:#FFC933;--mint:#1FCB8E}
+*{box-sizing:border-box}
+body{margin:0;background:var(--chalk);color:var(--ink);font:600 15px/1.4 system-ui,sans-serif;display:grid;place-items:center;min-height:100vh;padding:16px}
+.card{width:min(420px,100%);background:var(--ink);color:var(--chalk);border:3px solid var(--ink);border-radius:22px;padding:12px;box-shadow:6px 6px 0 var(--blue)}
+.hud{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;font:12px ui-monospace,monospace;padding:2px 6px 10px}
+.hud b{display:block;font:900 22px 'Arial Narrow',Impact,sans-serif}
+.hud .r{text-align:right}.hud .m{background:#0B0F22;border:2px solid #3A4375;border-radius:12px;padding:4px 14px;text-align:center}
+.hud .m b{color:var(--yellow);font-size:26px;line-height:1}
+svg{display:block;width:100%;height:auto;border-radius:12px;background:#0B0F22}
+.tick{margin-top:10px;font:12px ui-monospace,monospace;background:#0B0F22;border-radius:10px;padding:8px 12px;color:#C8D0F0;min-height:56px}
+.tick div{opacity:.6}.tick div:first-child{opacity:1}.tick i{color:var(--yellow);font-style:normal}
+button{margin-top:10px;width:100%;font:800 15px system-ui;color:#fff;background:var(--blue);border:2px solid var(--ink);border-radius:10px;padding:9px;box-shadow:0 3px 0 #000;cursor:pointer}
+.res{margin-top:10px;font:12px ui-monospace,monospace;columns:2}
+</style></head><body>
+<div class="card">
+  <div class="hud"><div>TOI<b id="me">-</b></div><div class="m"><span id="pos">P- / 12</span><b id="clock">00:00</b></div><div class="r"><span id="lead">-</span><b>&nbsp;</b></div></div>
+  <svg viewBox="0 0 200 150" id="svg"><path id="trk" fill="none" stroke="#2C3563" stroke-width="13" stroke-linejoin="round"/><path id="trk2" fill="none" stroke="#EEF2F8" stroke-width="1" stroke-dasharray="3 5" opacity=".5"/><g id="riders"></g></svg>
+  <div class="tick" id="tick"></div>
+  <button id="again">Rejouer</button>
+  <div class="res" id="res"></div>
+</div>
+<script>
+const RACE = /*DATA*/null/*END*/;
+const D='M40 110 C20 110 15 80 30 65 C45 50 70 60 85 45 C100 30 125 20 150 28 C180 38 195 65 175 80 C160 91 140 80 125 90 C110 100 125 125 100 130 C75 135 60 112 40 110 Z';
+const COL=['#1FCB8E','#3C5BFF','#FF4F8B','#FFC933','#FF8A3D','#8A5CF6','#22D3EE','#F5F7FF','#A3E635','#FB7185','#94A3B8','#E879F9'];
+const NS='http://www.w3.org/2000/svg';
+const trk=document.getElementById('trk');trk.setAttribute('d',D);document.getElementById('trk2').setAttribute('d',D);
+const L=trk.getTotalLength(),g=document.getElementById('riders');
+const dots=RACE.teams.map((t,i)=>{const c=document.createElementNS(NS,'circle');c.setAttribute('r',i===0?4.6:3.4);c.setAttribute('fill',COL[i%COL.length]);c.setAttribute('stroke',i===0?'#fff':'#EEF2F8');c.setAttribute('stroke-width',i===0?1.6:.8);g.appendChild(c);return c});
+const GAP=4; // l'affichage exagère les écarts pour qu'un peloton serré reste lisible
+let t0=null,shown=0,speed=1;
+function pt(frac,lane){const p=trk.getPointAtLength(frac*L),q=trk.getPointAtLength((frac*L+1)%L);const dx=q.x-p.x,dy=q.y-p.y,n=Math.hypot(dx,dy)||1;return[p.x-dy/n*lane,p.y+dx/n*lane]}
+function frame(sec){const F=RACE.frames;let i=Math.min(F.length-1,Math.floor(sec/RACE.snap));const a=F[i],b=F[Math.min(F.length-1,i+1)];const k=Math.min(1,Math.max(0,(sec-i*RACE.snap)/RACE.snap));return a.map((v,j)=>v+(b[j]-v)*k)}
+function fmt(s){s=Math.max(0,Math.ceil(s));return '00:'+String(s).padStart(2,'0')}
+function render(now){if(t0===null)t0=now;const sec=(now-t0)/1000*speed;const pos=frame(Math.min(sec,RACE.frames.length*RACE.snap-RACE.snap));
+ const order=pos.map((p,i)=>[p,i]).sort((a,b)=>b[0]-a[0]);const rank=[];order.forEach((o,k)=>rank[o[1]]=k+1);
+ const lead=order[0][0];pos.forEach((p,i)=>{const lane=((rank[i]%4)-1.5)*2.4;const vis=Math.max(0,lead-(lead-p)*GAP);const[x,y]=pt(vis*0.98,lane);dots[i].setAttribute('cx',x.toFixed(1));dots[i].setAttribute('cy',y.toFixed(1))});
+ document.getElementById('pos').textContent='P'+rank[0]+' / '+RACE.teams.length;document.getElementById('clock').textContent=fmt(RACE.duration-sec);
+ document.getElementById('lead').textContent=RACE.teams[order[0][1]];
+ while(shown<RACE.events.length&&RACE.events[shown].t<=sec){shown++}
+ const last=RACE.events.slice(Math.max(0,shown-3),shown).reverse();document.getElementById('tick').innerHTML=last.map(e=>'<div>'+e.text+'</div>').join('');
+ if(sec<RACE.duration+2)requestAnimationFrame(render);else done();}
+function done(){document.getElementById('res').innerHTML=RACE.standings.map((s,i)=>(i+1)+'. '+s).join('<br>')}
+function start(){t0=null;shown=0;document.getElementById('res').innerHTML='';requestAnimationFrame(render)}
+document.getElementById('again').onclick=start;document.getElementById('me').textContent=RACE.teams[0];start();
+</script></body></html>

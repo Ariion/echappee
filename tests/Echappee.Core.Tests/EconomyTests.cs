@@ -424,3 +424,16 @@ public class PacingTests
         for (int i = 1; i < f.Length; i++) Assert.True(f[i] > f[i - 1]);
     }
 }
+
+public class ComplianceTests
+{
+    [Fact]
+    public void Paid_packs_can_be_blocked_per_country()
+    {
+        var packs = new PackService(TestData.Load());
+        Assert.False(packs.IsPaidOpeningAllowed("BE"));
+        Assert.False(packs.IsPaidOpeningAllowed("be"));
+        Assert.True(packs.IsPaidOpeningAllowed("FR"));
+        Assert.True(packs.IsPaidOpeningAllowed(null));
+    }
+}
