@@ -1,0 +1,45 @@
+@inherits GameComponent
+
+<section class="screen">
+    <div class="titlebar"><h1>@T("ui.team")</h1><span>@T("ui.power") @G.Packs.BuildTeam(G.S, "p", "p").Power()</span></div>
+
+    @foreach (var key in new[] { "pro", "elite" })
+    {
+        var p = G.Packs.Pack(key);
+        <div class="pack @(key == "pro" ? "b" : "v")">
+            <h4>@T("pack." + key)</h4>
+            <p>@T("pack.guarantee." + key, p.GuaranteeWithin)</p>
+            <div class="row2">
+                <button class="btn" disabled="@(G.S.Watts < p.WattsCost)" @onclick="() => G.OpenPack(key, 1)">×1 · @p.WattsCost W</button>
+                <button class="btn" disabled="@(G.S.Watts < p.MultiPullCost)" @onclick="() => G.OpenPack(key, p.MultiPullCount)">×@p.MultiPullCount · @p.MultiPullCost W</button>
+            </div>
+            <details>
+                <summary>@T("ui.odds")</summary>
+                <ul class="odds">
+                    @foreach (var kv in G.Packs.DisplayedOdds(key))
+                    {
+                        <li><span class="tier @RarityClass(kv.Key)">@RarityName(kv.Key)</span><b>@kv.Value.ToString("0.0#", System.Globalization.CultureInfo.InvariantCulture).Replace(".", G.Dec) %</b></li>
+                    }
+                </ul>
+                <small>@T("pack.guarantee." + key, p.GuaranteeWithin) · @T("ui.pity") @(G.S.PityCounters.TryGetValue(key, out var c) ? c : 0) / @p.GuaranteeWithin</small>
+            </details>
+        </div>
+    }
+    <button class="btn full" disabled="@(G.FreePacksLeft <= 0)" @onclick="G.OpenFreePack">@T("btn.freePack") (@G.FreePacksLeft / @G.Data.Balance.Economy.FreePacksPerDay)</button>
+
+    <h2 class="h">@T("ui.starters") @G.S.Starters.Count / @G.Data.Balance.Race.StartersPerTeam</h2>
+    @foreach (var id in G.S.Starters.ToList()) { <RiderRow Id="@id" Starter="true" /> }
+
+    @if (bench.Any())
+    {
+        <h2 class="h">@T("ui.bench")</h2>
+        @foreach (var id in bench) { <RiderRow Id="@id" Starter="false" /> }
+    }
+
+    <button class="btn ghost full" @onclick='() => OnNavigate.InvokeAsync("studio")'>@T("ui.studio")</button>
+</section>
+
+@code {
+    [Parameter] public EventCallback<string> OnNavigate { get; set; }
+    IEnumerable<string> bench => G.S.Cards.Keys.Where(k => !G.S.Starters.Contains(k)).OrderByDescending(k => G.Score(k));
+}

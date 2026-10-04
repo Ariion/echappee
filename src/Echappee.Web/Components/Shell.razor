@@ -1,0 +1,96 @@
+@inherits GameComponent
+@implements IAsyncDisposable
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="i-coin" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/></symbol>
+  <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2 5 13h5l-1 9 8-12h-5z"/></symbol>
+  <symbol id="i-trophy" viewBox="0 0 24 24"><path d="M7 4h10v4a5 5 0 0 1-10 0zM7 6H4v1a3 3 0 0 0 3 3M17 6h3v1a3 3 0 0 1-3 3M12 13v4M8 21h8M10 17h4v4h-4z"/></symbol>
+  <symbol id="i-flag" viewBox="0 0 24 24"><path d="M6 3v18M6 4h12l-3 4 3 4H6"/></symbol>
+  <symbol id="i-bike" viewBox="0 0 24 24"><circle cx="6" cy="16" r="4"/><circle cx="18" cy="16" r="4"/><path d="M6 16l4-8h5l3 8M10 8l2 8M9 6h3"/></symbol>
+  <symbol id="i-shirt" viewBox="0 0 24 24"><path d="M8 3 3 6l2 4 2-1v11h10V9l2 1 2-4-5-3a4 4 0 0 1-8 0z"/></symbol>
+  <symbol id="i-shop" viewBox="0 0 24 24"><path d="M3 4h3l2 11h10l2-8H7"/><circle cx="9.5" cy="19.5" r="1"/><circle cx="17" cy="19.5" r="1"/></symbol>
+  <symbol id="i-cards" viewBox="0 0 24 24"><rect x="5" y="3" width="11" height="15" rx="2"/><path d="M9 21h8a2 2 0 0 0 2-2V8"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="6" y="11" width="12" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m10 9 5 3-5 3z"/></symbol>
+  <symbol id="i-rider" viewBox="0 0 24 24"><path d="M5 22c0-5 3-8 7-8s7 3 7 8z"/><path d="M7 9a5 5 0 0 1 10 0v1H7z"/><circle cx="12" cy="11" r="3.2"/></symbol>
+  <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></symbol>
+</svg>
+
+@if (G.Error != null)
+{
+    <div class="boot err">@G.Error</div>
+}
+else if (!G.Ready)
+{
+    <div class="boot">ÉCHAPPÉE</div>
+}
+else
+{
+    <div class="app">
+        <header class="top">
+            <div class="pill"><svg class="ic c-prime"><use href="#i-coin"/></svg>@G.Fmt(G.S.Primes)</div>
+            <div class="pill w"><svg class="ic c-watt"><use href="#i-bolt"/></svg>@G.S.Watts</div>
+            <div class="rev"><small>@T("ui.income")</small><b>@G.Fmt(G.Eco.IncomePerSecond(G.S, G.Now))@(G.Eco.BoostActive(G.S, G.Now) ? " ×2" : "")</b></div>
+            <button class="gear" aria-label="@T("ui.settings")" @onclick='() => Go("settings")'><svg class="ic"><use href="#i-gear"/></svg></button>
+        </header>
+
+        <main>
+            @switch (screen)
+            {
+                case "race": <RaceScreen OnNavigate="Go" /> break;
+                case "team": <TeamScreen OnNavigate="Go" /> break;
+                case "plan": <PlanScreen /> break;
+                case "leagues": <LeaguesScreen /> break;
+                case "shop": <ShopScreen /> break;
+                case "disc": <DisciplinesScreen OnNavigate="Go" /> break;
+                case "studio": <StudioScreen OnNavigate="Go" /> break;
+                case "settings": <SettingsScreen OnNavigate="Go" /> break;
+            }
+        </main>
+
+        <nav class="nav">
+            @foreach (var (id, icon) in Tabs)
+            {
+                <button class="@(screen == id ? "on" : "")" @onclick="() => Go(id)" aria-label="@T("ui." + id)"><svg class="ic"><use href="#@icon"/></svg><span>@T("ui." + id)</span></button>
+            }
+        </nav>
+    </div>
+
+    <Overlays />
+}
+
+@code {
+    string screen = "race";
+    static readonly (string, string)[] Tabs =
+    {
+        ("race", "i-flag"), ("team", "i-cards"), ("plan", "i-bike"), ("leagues", "i-trophy"), ("shop", "i-shop")
+    };
+
+    PeriodicTimer timer;
+    CancellationTokenSource cts = new();
+
+    void Go(string s) { screen = s; G.CloseRace(); StateHasChanged(); }
+
+    protected override async Task OnInitializedAsync()
+    {
+        base.OnInitialized();
+        await G.InitAsync();
+        timer = new PeriodicTimer(TimeSpan.FromMilliseconds(100));
+        _ = Loop();
+    }
+
+    async Task Loop()
+    {
+        try
+        {
+            while (await timer.WaitForNextTickAsync(cts.Token))
+            {
+                G.Step(0.1);
+                G.TickVideo(0.1);
+            }
+        }
+        catch (OperationCanceledException) { }
+    }
+
+    public ValueTask DisposeAsync() { cts.Cancel(); timer?.Dispose(); return ValueTask.CompletedTask; }
+}

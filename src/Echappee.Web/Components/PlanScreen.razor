@@ -1,0 +1,89 @@
+@inherits GameComponent
+
+<section class="screen">
+    <div class="titlebar"><h1>@T("ui.plan")</h1><span>@T("plan.active") @G.Plan.Rules.Count(r => r.Active) / @Slots</span></div>
+    <p class="hint">@T("plan.hint")</p>
+
+    @for (int i = 0; i < G.Plan.Rules.Count; i++)
+    {
+        int idx = i; var rule = G.Plan.Rules[i];
+        <div class="rule @(rule.Active ? "" : "off")">
+            <span class="k">@T("plan.if")</span>
+            <select @onchange="e => rule.Condition = Parse<ConditionKind>(e)" aria-label="@T("plan.if")">
+                @foreach (ConditionKind c in Enum.GetValues(typeof(ConditionKind))) { <option value="@c" selected="@(rule.Condition == c)">@T("cond." + c)</option> }
+            </select>
+            <select @onchange="e => rule.Compare = Parse<Comparator>(e)">
+                @foreach (Comparator c in Enum.GetValues(typeof(Comparator))) { <option value="@c" selected="@(rule.Compare == c)">@(c == Comparator.Greater ? ">" : "<")</option> }
+            </select>
+            <input type="number" value="@rule.Threshold" @onchange="e => rule.Threshold = Num(e)" aria-label="@T("plan.value")" />
+            <span class="unit">@T("unit." + rule.Condition)</span>
+            <span class="k">@T("plan.then")</span>
+            <select @onchange="e => rule.Action = Parse<ActionKind>(e)">
+                @foreach (ActionKind a in Enum.GetValues(typeof(ActionKind))) { <option value="@a" selected="@(rule.Action == a)">@T(EventText.ActionKey(a))</option> }
+            </select>
+            <div class="ctl">
+                <button class="chipb" @onclick="() => Move(idx, -1)" disabled="@(idx == 0)" aria-label="↑">↑</button>
+                <button class="chipb" @onclick="() => Move(idx, 1)" disabled="@(idx == G.Plan.Rules.Count - 1)" aria-label="↓">↓</button>
+                <button class="chipb @(rule.Active ? "sel" : "")" @onclick="() => Toggle(rule)">@(rule.Active ? "ON" : "OFF")</button>
+                <button class="chipb" @onclick="() => Remove(idx)" aria-label="@T("btn.delete")">✕</button>
+            </div>
+        </div>
+    }
+
+    @if (G.Plan.Rules.Count < Slots)
+    {
+        <button class="add" @onclick="Add">+ @T("plan.add") · @(Slots - G.Plan.Rules.Count) @T("plan.free")</button>
+    }
+    else { <div class="add dis">@T("plan.full")</div> }
+
+    <button class="btn ghost full" @onclick="Recommended">@T("plan.recommended")</button>
+    <div class="sim">
+        <small>@T("plan.sim")</small>
+        @if (report != null)
+        {
+            <b>@Pct(report.Value.WinRateBefore) → @Pct(report.Value.WinRateAfter)</b>
+            <small>@T("plan.podium") @Pct(report.Value.PodiumBefore) → @Pct(report.Value.PodiumAfter) · @T("plan.avgRank") @report.Value.AvgRankBefore.ToString("0.0") → @report.Value.AvgRankAfter.ToString("0.0")</small>
+        }
+        else if (busy) { <b>…</b> }
+        <button class="btn" disabled="@busy" @onclick="Simulate">@T("plan.run")</button>
+    </div>
+    <button class="btn full" @onclick="Save">@T("btn.save")</button>
+</section>
+
+@code {
+    PlanReport? report; bool busy;
+    int Slots => 3 + (G.S.BestLeagueTier >= 2 ? 1 : 0) + (G.S.BestLeagueTier >= 4 ? 1 : 0);
+
+    protected override void OnParametersSet() { G.Plan.Slots = Slots; }
+
+    static T Parse<T>(ChangeEventArgs e) where T : struct => Enum.Parse<T>(e.Value?.ToString() ?? "");
+    static double Num(ChangeEventArgs e) => double.TryParse(e.Value?.ToString(), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var v) ? v : 0;
+    static string Pct(double v) => (v * 100).ToString("0") + " %";
+
+    void Add() { G.Plan.Rules.Add(new PlanRule(ConditionKind.KmRemaining, Comparator.Less, 12, ActionKind.SprinterLaunch)); report = null; }
+    void Recommended()
+    {
+        G.Plan.Rules.Clear();
+        var all = new[] {
+            new PlanRule(ConditionKind.KmRemaining, Comparator.Less, 12, ActionKind.SprinterLaunch),
+            new PlanRule(ConditionKind.Fatigue, Comparator.Greater, 65, ActionKind.StayInWheel),
+            new PlanRule(ConditionKind.Gradient, Comparator.Greater, 6, ActionKind.ClimberAttacks) };
+        foreach (var r in all.Take(Slots)) G.Plan.Rules.Add(r);
+        report = null;
+    }
+    void Remove(int i) { G.Plan.Rules.RemoveAt(i); report = null; }
+    void Toggle(PlanRule r) { r.Active = !r.Active; report = null; }
+    void Move(int i, int d) { var r = G.Plan.Rules[i]; G.Plan.Rules.RemoveAt(i); G.Plan.Rules.Insert(i + d, r); report = null; }
+    void Save() { _ = G.SaveAsync(); G.ShowToast(T("msg.saved")); }
+
+    async Task Simulate()
+    {
+        busy = true; report = null; await Task.Delay(50);
+        var cfg = G.Data.Balance;
+        var key = G.S.SelectedDiscipline;
+        var disc = cfg.Disciplines[key];
+        var p = G.Packs.BuildTeam(G.S, "player", G.TeamName);
+        report = PlanAnalyzer.Compare(cfg, G.Data.Courses[disc.Circuit], disc, p, new PlanDeCourse { Slots = Slots }, G.Plan, G.BotLevel, 1000, 100);
+        busy = false;
+    }
+}

@@ -1,0 +1,25 @@
+@inherits GameComponent
+
+<section class="screen">
+    <div class="titlebar"><h1>@T("ui.disc")</h1><span>@G.Data.Balance.Disciplines.Keys.Count(G.DisciplineUnlocked) / @G.Data.Balance.Disciplines.Count</span></div>
+    <div class="dgrid">
+        @foreach (var kv in G.Data.Balance.Disciplines)
+        {
+            var d = kv.Value; bool open = G.DisciplineUnlocked(kv.Key);
+            <button class="dt @(open ? "" : "lock") @(G.S.SelectedDiscipline == kv.Key ? "on" : "")" disabled="@(!open)" @onclick='() => { G.SelectDiscipline(kv.Key); OnNavigate.InvokeAsync("race"); }'>
+                @if (!open) { <svg class="ic lk"><use href="#i-lock"/></svg> }
+                <b>@T("disc." + kv.Key)</b>
+                <small>@d.DurationSeconds s · @(open ? T("ui.unlocked") : T("ui.unlockAt", T("tier." + Array.IndexOf(G.Data.Balance.Leagues.Tiers, d.UnlockLeague))))</small>
+                <div class="w">
+                    <span>SPR <i style="width:@W(d.Sprint)"></i></span><span>GRP <i style="width:@W(d.Climb)"></i></span>
+                    <span>ROU <i style="width:@W(d.Rouleur)"></i></span><span>TEC <i style="width:@W(d.Technique)"></i></span>
+                </div>
+            </button>
+        }
+    </div>
+</section>
+
+@code {
+    [Parameter] public EventCallback<string> OnNavigate { get; set; }
+    static string W(int w) => (w * 100 / 3) + "%";
+}

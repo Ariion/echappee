@@ -1,0 +1,36 @@
+{
+  "route": { "Id": "route", "Segments": [
+    { "Type": "Flat", "lengthPct": 18, "Gradient": 0 },
+    { "Type": "Climb", "lengthPct": 22, "Gradient": 7 },
+    { "Type": "Descent", "lengthPct": 12, "Gradient": -6 },
+    { "Type": "Flat", "lengthPct": 22, "Gradient": 1 },
+    { "Type": "Technical", "lengthPct": 8, "Gradient": 0 },
+    { "Type": "Sprint", "lengthPct": 18, "Gradient": 0 } ] },
+  "piste": { "Id": "piste", "Segments": [
+    { "Type": "Flat", "lengthPct": 45, "Gradient": 0 },
+    { "Type": "Technical", "lengthPct": 20, "Gradient": 0 },
+    { "Type": "Sprint", "lengthPct": 35, "Gradient": 0 } ] },
+  "bmx": { "Id": "bmx", "Segments": [
+    { "Type": "Sprint", "lengthPct": 25, "Gradient": 0 },
+    { "Type": "Technical", "lengthPct": 45, "Gradient": 0 },
+    { "Type": "Climb", "lengthPct": 10, "Gradient": 5 },
+    { "Type": "Sprint", "lengthPct": 20, "Gradient": 0 } ] },
+  "vtt": { "Id": "vtt", "Segments": [
+    { "Type": "Climb", "lengthPct": 30, "Gradient": 9 },
+    { "Type": "Technical", "lengthPct": 20, "Gradient": 0 },
+    { "Type": "Descent", "lengthPct": 20, "Gradient": -8 },
+    { "Type": "Climb", "lengthPct": 18, "Gradient": 8 },
+    { "Type": "Sprint", "lengthPct": 12, "Gradient": 0 } ] },
+  "cyclocross": { "Id": "cyclocross", "Segments": [
+    { "Type": "Flat", "lengthPct": 20, "Gradient": 0 },
+    { "Type": "Technical", "lengthPct": 30, "Gradient": 0 },
+    { "Type": "Climb", "lengthPct": 15, "Gradient": 6 },
+    { "Type": "Technical", "lengthPct": 20, "Gradient": 0 },
+    { "Type": "Sprint", "lengthPct": 15, "Gradient": 0 } ] },
+  "gravel": { "Id": "gravel", "Segments": [
+    { "Type": "Flat", "lengthPct": 28, "Gradient": 0 },
+    { "Type": "Climb", "lengthPct": 17, "Gradient": 6 },
+    { "Type": "Flat", "lengthPct": 25, "Gradient": 1 },
+    { "Type": "Technical", "lengthPct": 12, "Gradient": 0 },
+    { "Type": "Sprint", "lengthPct": 18, "Gradient": 0 } ] }
+}

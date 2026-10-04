@@ -1,0 +1,64 @@
+@inherits GameComponent
+
+@if (G.PendingOffline != null)
+{
+    <div class="modal"><div class="sheet center">
+        <h3>@T("off.title")</h3>
+        <p>@T("off.text", Dur((long)G.PendingOffline.SecondsAway))</p>
+        <div class="big">+@G.Fmt(G.PendingOffline.Earned)</div>
+        @if (G.PendingOffline.Capped) { <small>@T("off.capped", (int)G.Data.Balance.Economy.OfflineCapHours)</small> }
+        <div class="row2">
+            <button class="btn" @onclick="() => G.ClaimOffline(false)">@T("btn.claim")</button>
+            <button class="btn y" @onclick="() => G.WatchVideo(() => G.ClaimOffline(true))">@T("off.video", G.Data.Balance.Economy.OfflineVideoMultiplier)</button>
+        </div>
+    </div></div>
+}
+else if (G.PendingDailyWatts > 0)
+{
+    <div class="modal"><div class="sheet center">
+        <h3>@T("daily.title")</h3>
+        <div class="big">+@G.PendingDailyWatts W</div>
+        <button class="btn" @onclick="G.AckDaily">@T("btn.claim")</button>
+    </div></div>
+}
+else if (G.PendingLeague != null)
+{
+    <div class="modal"><div class="sheet center">
+        <h3>@T("league.end")</h3>
+        <p>@T("league.rank", G.PendingLeague.Rank)</p>
+        <div class="big">@T(G.PendingLeague.Outcome == LeagueOutcome.Promoted ? "ui.promotion" : G.PendingLeague.Outcome == LeagueOutcome.Relegated ? "ui.relegation" : "ui.stay")</div>
+        <p>@T("tier." + G.PendingLeague.ToTier)@(G.PendingLeague.Watts > 0 ? " · +" + G.PendingLeague.Watts + " W" : "")</p>
+        <button class="btn" @onclick="G.AckLeague">OK</button>
+    </div></div>
+}
+
+@if (G.LastPulls != null)
+{
+    <div class="modal"><div class="sheet">
+        <h3 class="center">@T("pack." + G.LastPackKey)</h3>
+        <div class="pulls">
+            @foreach (var p in G.LastPulls)
+            {
+                <div class="pull @RarityClass(p.Rarity) @(p.ForcedByGuarantee ? "forced" : "")">
+                    <div class="avatar" style="background:@AvatarColor(p.Rarity)"><svg class="ic"><use href="#i-rider"/></svg></div>
+                    <b>@p.Card.Name</b>
+                    <span class="tier @RarityClass(p.Rarity)">@RarityName(p.Rarity)</span>
+                    <small>@(p.IsNew ? T("ui.new") : "+" + p.FragmentsGained + " " + T("ui.fragments"))</small>
+                </div>
+            }
+        </div>
+        <button class="btn full" @onclick="G.CloseCards">OK</button>
+    </div></div>
+}
+
+@if (G.PendingVideoReward != null)
+{
+    <div class="modal"><div class="sheet center video">
+        <h3>@T("video.title")</h3>
+        <p>@T("video.sim")</p>
+        <div class="big">@Math.Max(0, (int)Math.Ceiling(G.VideoCountdown))</div>
+        <button class="btn ghost" @onclick="G.CancelVideo">@T("btn.close")</button>
+    </div></div>
+}
+
+@if (G.Toast != null) { <div class="toast" role="status">@G.Toast</div> }

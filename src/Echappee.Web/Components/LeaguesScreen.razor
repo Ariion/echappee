@@ -1,0 +1,31 @@
+@inherits GameComponent
+
+<section class="screen">
+    <div class="titlebar"><h1>@T("ui.leagues")</h1><span>@T("tier." + G.League.Tier) · @Dur(G.League.EndUnix - G.Now)</span></div>
+    <div class="ladder">
+        @for (int i = 0; i < G.Data.Balance.Leagues.Tiers.Length; i++)
+        {
+            <span class="@(i == G.League.Tier ? "on" : "")">@T("tier.short." + i)</span>
+        }
+    </div>
+    @{ var st = G.League.Standings(); }
+    <div class="table">
+        <div class="h"><span>#</span><span>@T("ui.team")</span><span>@T("ui.pts")</span></div>
+        @for (int i = 0; i < st.Count; i++)
+        {
+            int rank = i + 1; var e = st[i];
+            var zone = G.League.ZoneOfRank(rank);
+            @if (rank == G.Data.Balance.Leagues.Promoted + 1) { <div class="zone">@T("ui.stay")</div> }
+            @if (rank == st.Count - G.Data.Balance.Leagues.Relegated + 1) { <div class="zone">@T("ui.relegation")</div> }
+            <div class="r @(e.IsPlayer ? "me" : zone == LeagueOutcome.Promoted ? "up" : zone == LeagueOutcome.Relegated ? "dn" : "")">
+                <span>@rank</span><span>@(e.IsPlayer ? TeamName() : e.Name) <small>(@e.Power)</small></span><i>@e.Points</i>
+            </div>
+        }
+    </div>
+    <p class="hint">@T("league.hint", G.Data.Balance.Leagues.Promoted, G.Data.Balance.Leagues.Relegated)</p>
+</section>
+
+@code {
+    string TeamName() => G.TeamName;
+    protected override void OnParametersSet() { G.League.Entries[0].Power = Math.Round(G.PlayerPower()); }
+}

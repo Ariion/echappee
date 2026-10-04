@@ -1,0 +1,32 @@
+@inherits GameComponent
+
+@{
+    var def = G.Def(Id);
+    var o = G.S.Cards[Id];
+    var r = def.ToRider(o.Level, G.Data.Balance.Economy.LevelStatBonusPct);
+    long cost = G.Packs.LevelUpCost(o);
+}
+<div class="rider card">
+    <div class="avatar" style="background:@AvatarColor(def.Rarity)"><svg class="ic"><use href="#i-rider"/></svg><b>@o.Level</b></div>
+    <div class="info">
+        <div class="nm">@def.Name <span class="tier @RarityClass(def.Rarity)">@RarityName(def.Rarity)</span></div>
+        <div class="stats">
+            <span><em>SPR</em>@Math.Round(r.Stats.Sprint)</span><span><em>GRP</em>@Math.Round(r.Stats.Climb)</span>
+            <span><em>ROU</em>@Math.Round(r.Stats.Rouleur)</span><span><em>TEC</em>@Math.Round(r.Stats.Technique)</span>
+        </div>
+        @if (cost > 0)
+        {
+            <div class="frag"><i style="width:@(Math.Min(100, 100.0 * o.Fragments / cost).ToString("0", System.Globalization.CultureInfo.InvariantCulture))%"></i><small>@o.Fragments / @cost @T("ui.fragments")</small></div>
+        }
+    </div>
+    <div class="acts">
+        @if (cost > 0 && o.Fragments >= cost) { <button class="btn sm" @onclick="() => G.LevelUp(Id)">@T("btn.levelUp")</button> }
+        @if (Starter) { <button class="btn sm ghost" disabled="@(G.S.Starters.Count <= 1)" @onclick="() => G.ToBench(Id)">↓</button> }
+        else { <button class="btn sm ghost" @onclick="() => G.ToStarters(Id)">↑</button> }
+    </div>
+</div>
+
+@code {
+    [Parameter] public string Id { get; set; }
+    [Parameter] public bool Starter { get; set; }
+}

@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>Echappee.Web</RootNamespace>
+    <ServiceWorkerAssetsManifest>service-worker-assets.js</ServiceWorkerAssetsManifest>
+    <InvariantGlobalization>false</InvariantGlobalization>
+    <BlazorEnableTimeZoneSupport>false</BlazorEnableTimeZoneSupport>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.31" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.31" PrivateAssets="all" />
+    <ProjectReference Include="../Echappee.Core/Echappee.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ServiceWorker Include="wwwroot\service-worker.js" PublishedContent="wwwroot\service-worker.published.js" />
+  </ItemGroup>
+
+  <!-- Les données d'équilibrage sont la source unique : on les copie dans wwwroot/data avant chaque build. -->
+  <Target Name="CopyGameData" BeforeTargets="BeforeBuild;ResolveStaticWebAssetsInputs">
+    <ItemGroup>
+      <GameDataFiles Include="$(MSBuildThisFileDirectory)../../data/**/*.json" />
+    </ItemGroup>
+    <Copy SourceFiles="@(GameDataFiles)" DestinationFiles="@(GameDataFiles->'$(MSBuildThisFileDirectory)wwwroot/data/%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+  </Target>
+
+</Project>
